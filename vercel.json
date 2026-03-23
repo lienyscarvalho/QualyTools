@@ -1,0 +1,4 @@
+frontend/vercel.json
+json{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

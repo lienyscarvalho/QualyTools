@@ -1,0 +1,1373 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QualyTools — Ferramentas da Qualidade com IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pdca:#6C63FF;--fca:#FF6B6B;--ishikawa:#FFA94D;--pareto:#20C997;
+  --5w2h:#339AF0;--gut:#F06595;--fmea:#CC5DE8;--5por:#74C0FC;
+  --brainstorm:#69DB7C;--fluxo:#FFD43B;--sipoc:#FF8787;--histograma:#A9E34B;
+  --dark:#0D0F1A;--dark2:#13162A;--dark3:#1A1E35;--card:#1E2340;
+  --border:rgba(255,255,255,0.08);--text:#E8EAFF;--muted:#8B90B8;
+  --gold:#FFD43B;--white:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;}
+.hidden{display:none!important;}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .8rem;border-radius:20px;margin-bottom:1rem;}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none;text-decoration:none;transition:all .3s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--pdca);color:#fff;}
+.btn-primary:hover{filter:brightness(1.2);transform:translateY(-2px);}
+.btn-outline{background:transparent;color:var(--text);border:2px solid var(--border);}
+.btn-outline:hover{border-color:var(--pdca);color:var(--pdca);}
+.badge-free{background:rgba(32,201,151,.15);color:#20C997;border:1px solid rgba(32,201,151,.3);}
+.badge-pro{background:rgba(108,99,255,.15);color:#A78BFA;border:1px solid rgba(108,99,255,.3);}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;width:100%;z-index:9999;background:rgba(13,15,26,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:64px;}
+.logo-bar{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;cursor:pointer;}
+.logo-bar span{background:linear-gradient(90deg,var(--pdca),var(--fca),var(--ishikawa));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-bar{display:flex;gap:1.5rem;list-style:none;}
+.nav-bar a{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:color .3s;}
+.nav-bar a:hover,.nav-bar a.active{color:var(--text);}
+.topbar-right{display:flex;gap:.8rem;align-items:center;}
+.user-chip{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);padding:.4rem 1rem;border-radius:20px;font-size:.82rem;cursor:pointer;}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pdca),var(--fca));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;}
+
+/* LANDING */
+#landing{padding-top:64px;}
+.hero{min-height:calc(100vh - 64px);background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(108,99,255,.25) 0%,transparent 70%),var(--dark);display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 5%;position:relative;overflow:hidden;}
+.hero-bg-shapes{position:absolute;inset:0;pointer-events:none;}
+.shape{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;}
+.shape1{width:400px;height:400px;background:var(--pdca);top:-100px;left:-100px;}
+.shape2{width:300px;height:300px;background:var(--fca);bottom:-50px;right:-50px;}
+.shape3{width:200px;height:200px;background:var(--ishikawa);top:50%;left:70%;}
+.hero-content{position:relative;z-index:2;max-width:780px;}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1.5rem;}
+.hero-eyebrow span{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--pdca);}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:800;line-height:1.05;margin-bottom:1.5rem;}
+.hero-title .grad{background:linear-gradient(90deg,var(--pdca) 0%,var(--fca) 40%,var(--ishikawa) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{font-size:1.1rem;color:var(--muted);line-height:1.7;max-width:560px;margin:0 auto 2.5rem;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.hero-tools-strip{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:3rem;padding-top:3rem;border-top:1px solid var(--border);}
+.tool-pill{padding:.35rem .9rem;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid;}
+
+/* FEATURES */
+.features{padding:100px 5%;background:var(--dark2);}
+.features-header{text-align:center;margin-bottom:4rem;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;transition:transform .3s;}
+.feat-card:hover{transform:translateY(-6px);}
+.feat-icon{font-size:2.2rem;margin-bottom:1rem;}
+.feat-card h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;}
+.feat-card p{font-size:.87rem;color:var(--muted);line-height:1.6;}
+
+/* PRICING */
+.pricing{padding:100px 5%;text-align:center;}
+.pricing-header{margin-bottom:4rem;}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:800px;margin:0 auto;}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;text-align:left;position:relative;transition:all .3s;}
+.price-card.featured{border-color:var(--pdca);background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(255,107,107,.08));}
+.price-card:hover{transform:translateY(-4px);}
+.price-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--pdca);color:#fff;font-size:.7rem;font-weight:800;padding:.3rem 1rem;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.price-name{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;}
+.price-val{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;line-height:1;margin-bottom:.3rem;}
+.price-period{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem;}
+.price-features li{font-size:.87rem;display:flex;align-items:center;gap:.7rem;}
+.price-features li::before{content:'✓';color:var(--pdca);font-weight:800;flex-shrink:0;}
+.price-features li.off{color:var(--muted);opacity:.5;}
+.price-features li.off::before{content:'✗';color:var(--muted);}
+.price-btn{display:block;text-align:center;padding:.9rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:2px solid var(--border);color:var(--text);background:transparent;font-family:'Inter',sans-serif;transition:all .3s;width:100%;}
+.price-card.featured .price-btn{background:var(--pdca);border-color:var(--pdca);color:#fff;}
+.price-btn:hover{background:var(--pdca);border-color:var(--pdca);color:#fff;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-box{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:440px;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:.3rem;}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.4rem;}
+.modal-sub{font-size:.87rem;color:var(--muted);margin-bottom:2rem;}
+.modal-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;background:var(--dark2);border-radius:10px;padding:.3rem;}
+.modal-tab{flex:1;padding:.6rem;border-radius:8px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:.85rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;}
+.modal-tab.active{background:var(--pdca);color:#fff;}
+.form-g{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;}
+.form-g label{font-size:.78rem;font-weight:600;color:var(--muted);}
+.form-g input,.form-g select,.form-g textarea{padding:.85rem 1rem;background:var(--dark2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border-color .3s;}
+.form-g input:focus,.form-g select:focus{border-color:var(--pdca);}
+.modal-btn{width:100%;padding:1rem;border-radius:10px;border:none;background:var(--pdca);color:#fff;font-weight:800;font-size:.95rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;margin-top:.5rem;}
+.modal-btn:hover{filter:brightness(1.2);}
+.plan-select{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem;}
+.plan-opt{border:2px solid var(--border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .3s;text-align:center;}
+.plan-opt.selected{border-color:var(--pdca);background:rgba(108,99,255,.15);}
+.plan-opt h4{font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
+.plan-opt p{font-size:.75rem;color:var(--muted);}
+
+/* DASHBOARD */
+#dashboard{padding-top:64px;}
+.dash-layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px);}
+.sidebar{background:var(--dark2);border-right:1px solid var(--border);padding:2rem 1.2rem;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
+.sidebar-section{margin-bottom:2rem;}
+.sidebar-label{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;padding:0 .8rem;}
+.sidebar-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .8rem;border-radius:10px;cursor:pointer;transition:all .3s;font-size:.87rem;font-weight:500;color:var(--muted);margin-bottom:.2rem;}
+.sidebar-item:hover,.sidebar-item.active{background:var(--card);color:var(--text);}
+.sidebar-item .si-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dash-main{padding:2.5rem;overflow-y:auto;}
+.dash-section{display:none;}
+.dash-section.active{display:block;}
+.dash-greeting{margin-bottom:2.5rem;}
+.dash-greeting h1{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:.4rem;}
+.dash-greeting p{color:var(--muted);font-size:.92rem;}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2.5rem;}
+.d-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
+.d-card-icon{font-size:1.8rem;margin-bottom:.8rem;}
+.d-card-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1;}
+.d-card-label{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
+
+/* IA SOLVER */
+.ia-box{background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(255,107,107,.08));border:1px solid rgba(108,99,255,.3);border-radius:20px;padding:2.5rem;margin-bottom:2.5rem;}
+.ia-box h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.5rem;}
+.ia-box p{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem;}
+.ia-input-row{display:flex;gap:1rem;}
+.ia-input-row textarea{flex:1;padding:1rem 1.2rem;background:var(--dark2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.92rem;outline:none;resize:none;min-height:80px;transition:border-color .3s;}
+.ia-input-row textarea:focus{border-color:var(--pdca);}
+.ia-send{padding:1rem 1.8rem;background:var(--pdca);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;align-self:flex-end;}
+.ia-send:hover{filter:brightness(1.2);}
+.ia-send:disabled{opacity:.5;cursor:not-allowed;}
+
+/* STREAMING */
+.ia-stream-box{background:var(--dark2);border:1px solid rgba(108,99,255,.3);border-radius:16px;padding:1.8rem;position:relative;}
+.ia-stream-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.ia-stream-icon{font-size:2rem;}
+.ia-stream-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;}
+.ia-stream-sub{font-size:.78rem;color:var(--muted);}
+.ia-stream-content{font-size:.9rem;line-height:1.8;color:var(--text);white-space:pre-wrap;word-wrap:break-word;}
+.ia-stream-content strong{color:var(--gold);font-weight:700;}
+.cursor-blink{display:inline-block;width:2px;height:1em;background:var(--pdca);animation:blink .8s infinite;vertical-align:middle;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.typing-dots{display:flex;gap:5px;padding:.5rem 0;}
+.typing-dot{width:8px;height:8px;border-radius:50%;background:var(--pdca);animation:typing .9s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+
+/* TOOL CARDS (ferramentas) */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.tool-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.15);}
+.tool-card-icon{font-size:2rem;margin-bottom:.8rem;}
+.tool-card-name{font-weight:800;font-size:1rem;margin-bottom:.3rem;}
+.tool-card-desc{font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:.8rem;}
+.tool-card-tags{display:flex;gap:.4rem;flex-wrap:wrap;}
+.tool-card-tag{font-size:.68rem;font-weight:700;padding:.2rem .6rem;border-radius:20px;}
+
+/* TOOL DETAIL */
+.tool-back{display:flex;align-items:center;gap:.5rem;color:var(--muted);cursor:pointer;font-size:.87rem;font-weight:600;margin-bottom:1.5rem;transition:color .3s;}
+.tool-back:hover{color:var(--text);}
+.tool-hero{border-radius:20px;padding:2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.tool-hero h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:.6rem;}
+.tool-hero p{font-size:1rem;opacity:.85;max-width:560px;line-height:1.6;}
+.tool-content-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;}
+.content-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:1.2rem;}
+.content-card h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem;}
+.content-card p,.content-card li{font-size:.88rem;color:var(--muted);line-height:1.7;}
+.content-card ul,.content-card ol{padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem;}
+.case-study{background:linear-gradient(135deg,rgba(32,201,151,.1),rgba(32,201,151,.03));border:1px solid rgba(32,201,151,.25);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem;}
+.case-telecom{background:rgba(51,154,240,.08);border:1px solid rgba(51,154,240,.2);border-radius:12px;padding:1.2rem;margin-top:1rem;}
+.case-telecom h4{color:var(--5w2h);font-size:.88rem;font-weight:700;margin-bottom:.5rem;}
+.steps-visual{display:flex;flex-direction:column;gap:.7rem;margin-top:1rem;}
+.step-item{display:flex;gap:.8rem;align-items:flex-start;}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;}
+.step-text strong{display:block;font-size:.88rem;margin-bottom:.2rem;}
+.step-text span{font-size:.8rem;color:var(--muted);}
+.ai-suggestion{background:var(--dark);border:1px solid rgba(108,99,255,.2);border-radius:10px;padding:1rem;margin-top:.8rem;font-size:.83rem;line-height:1.6;color:var(--text);white-space:pre-wrap;word-wrap:break-word;}
+.ai-suggestion strong{color:var(--gold);}
+.ia-tool-chat{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(108,99,255,.03));border:1px solid rgba(108,99,255,.25);border-radius:16px;padding:1.8rem;}
+.ia-tool-chat h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:.5rem;}
+.ia-tool-chat p{font-size:.83rem;color:var(--muted);margin-bottom:1rem;line-height:1.5;}
+.ia-tool-input{width:100%;padding:.8rem 1rem;background:var(--dark2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.85rem;outline:none;resize:none;min-height:70px;transition:border-color .3s;margin-bottom:.8rem;}
+.ia-tool-input:focus{border-color:var(--pdca);}
+
+/* ══════════════════════════════════════
+   TRAINING — Novo layout com aula interna
+══════════════════════════════════════ */
+.training-tabs{display:flex;gap:.8rem;margin-bottom:2rem;}
+.training-tab{padding:.7rem 1.5rem;border-radius:30px;border:2px solid var(--border);background:transparent;color:var(--muted);font-weight:700;font-size:.85rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;}
+.training-tab.active{border-color:var(--pdca);background:rgba(108,99,255,.15);color:var(--text);}
+.training-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+.training-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem;position:relative;transition:transform .3s;}
+.training-card:hover{transform:translateY(-4px);}
+.training-level{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem;}
+.training-card h3{font-size:1rem;font-weight:800;margin-bottom:.5rem;}
+.training-card p{font-size:.83rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;}
+.training-meta{display:flex;gap:1rem;font-size:.78rem;color:var(--muted);}
+.training-progress{height:4px;background:var(--border);border-radius:2px;margin-top:1rem;}
+.training-progress-bar{height:100%;border-radius:2px;}
+.training-btn-row{display:flex;gap:.6rem;margin-top:1rem;}
+.training-btn{flex:1;padding:.65rem .8rem;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;border:none;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.training-btn-open{color:#fff;}
+.training-btn-pdf{background:var(--dark2);color:var(--muted);border:1px solid var(--border);}
+.training-btn-pdf:hover{border-color:var(--gold);color:var(--gold);}
+
+/* AULA PAGE */
+.aula-wrap{background:var(--dark);min-height:100%;}
+.aula-back{display:flex;align-items:center;gap:.6rem;color:var(--muted);cursor:pointer;font-size:.87rem;font-weight:600;margin-bottom:1.5rem;transition:color .3s;}
+.aula-back:hover{color:var(--text);}
+.aula-header{border-radius:20px;padding:2.5rem;margin-bottom:2rem;}
+.aula-header h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:.5rem;}
+.aula-header p{font-size:.95rem;opacity:.85;line-height:1.6;max-width:600px;}
+.aula-header-meta{display:flex;gap:1.5rem;margin-top:1.2rem;flex-wrap:wrap;}
+.aula-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.82rem;opacity:.8;}
+.aula-export-btn{display:flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:rgba(255,212,59,.15);border:1px solid rgba(255,212,59,.4);border-radius:10px;color:var(--gold);font-weight:700;font-size:.83rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;margin-top:1.2rem;}
+.aula-export-btn:hover{background:rgba(255,212,59,.25);}
+.aula-body{display:grid;grid-template-columns:3fr 1fr;gap:1.5rem;}
+.aula-main{display:flex;flex-direction:column;gap:1.2rem;}
+.aula-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem;}
+.aula-section h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+.aula-section p,.aula-section li{font-size:.88rem;color:var(--muted);line-height:1.75;}
+.aula-section ul{padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem;}
+.aula-section ol{padding-left:1.2rem;display:flex;flex-direction:column;gap:.5rem;}
+.aula-section li{font-size:.88rem;color:var(--muted);}
+.aula-section li strong{color:var(--text);}
+.aula-step-grid{display:flex;flex-direction:column;gap:.8rem;}
+.aula-step{display:flex;gap:1rem;align-items:flex-start;padding:1rem;background:var(--dark2);border-radius:12px;}
+.aula-step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;color:#fff;}
+.aula-step-body strong{display:block;font-size:.88rem;margin-bottom:.3rem;}
+.aula-step-body span{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.aula-tip-box{background:linear-gradient(135deg,rgba(255,212,59,.1),rgba(255,212,59,.03));border:1px solid rgba(255,212,59,.25);border-radius:14px;padding:1.2rem;margin-top:1rem;}
+.aula-tip-box p{font-size:.85rem;color:var(--text);line-height:1.6;}
+.aula-telecom-box{background:linear-gradient(135deg,rgba(51,154,240,.12),rgba(51,154,240,.03));border:1px solid rgba(51,154,240,.3);border-radius:14px;padding:1.4rem;}
+.aula-telecom-box h4{color:var(--5w2h);font-size:.9rem;font-weight:800;margin-bottom:.6rem;}
+.aula-telecom-box p{font-size:.85rem;color:var(--muted);line-height:1.65;}
+.aula-quiz-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem;position:sticky;top:1rem;}
+.aula-quiz-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:1rem;}
+.quiz-q{font-size:.85rem;font-weight:600;margin-bottom:.8rem;line-height:1.5;}
+.quiz-opt{padding:.7rem 1rem;background:var(--dark2);border:1.5px solid var(--border);border-radius:8px;font-size:.82rem;cursor:pointer;margin-bottom:.5rem;transition:all .3s;}
+.quiz-opt:hover{border-color:var(--pdca);}
+.quiz-opt.correct{border-color:var(--pareto);background:rgba(32,201,151,.12);color:var(--pareto);}
+.quiz-opt.wrong{border-color:var(--fca);background:rgba(255,107,107,.1);color:var(--fca);}
+.quiz-feedback{font-size:.8rem;margin-top:.8rem;padding:.7rem 1rem;border-radius:8px;line-height:1.5;}
+.quiz-feedback.ok{background:rgba(32,201,151,.1);color:var(--pareto);border:1px solid rgba(32,201,151,.3);}
+.quiz-feedback.err{background:rgba(255,107,107,.1);color:var(--fca);border:1px solid rgba(255,107,107,.3);}
+.ia-tool-result{font-size:.85rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-wrap:break-word;}
+.ia-tool-result strong{color:var(--gold);}
+
+/* PDI */
+.pdi-hero{background:linear-gradient(135deg,rgba(255,212,59,.15),rgba(255,107,107,.1));border:1px solid rgba(255,212,59,.2);border-radius:20px;padding:2.5rem;margin-bottom:2rem;}
+.pdi-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.pdi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem;}
+.pdi-card h3{font-size:.95rem;font-weight:800;margin-bottom:1rem;}
+.competency-bar{margin-bottom:1rem;}
+.competency-bar label{display:flex;justify-content:space-between;font-size:.82rem;font-weight:600;margin-bottom:.4rem;}
+.competency-bar label span{color:var(--muted);}
+.bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.pdi-action-item{display:flex;gap:.8rem;align-items:center;padding:.8rem 1rem;background:var(--dark2);border-radius:10px;font-size:.85rem;margin-bottom:.6rem;}
+.pdi-action-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;}
+.pdi-action-check.done{background:var(--pdca);border-color:var(--pdca);}
+
+@media(max-width:900px){
+  .dash-layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .features-grid,.pricing-grid,.tools-grid,.training-grid,.pdi-grid{grid-template-columns:1fr;}
+  .tool-content-grid,.aula-body{grid-template-columns:1fr;}
+  .dash-cards{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .nav-bar{display:none;}
+  .hero-title{font-size:2.5rem;}
+  .ia-input-row{flex-direction:column;}
+  .dash-cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo-bar" onclick="showPage('landing')"><span>QualyTools</span></div>
+  <ul class="nav-bar" id="mainNav">
+    <li><a onclick="goSection('ferramentas')" id="nav-ferramentas">Ferramentas</a></li>
+    <li><a onclick="goSection('treinamento')" id="nav-treinamento">Treinamento</a></li>
+    <li><a onclick="goSection('pdi')" id="nav-pdi">PDI Gestor</a></li>
+  </ul>
+  <div class="topbar-right">
+    <div id="topbar-auth">
+      <button class="btn btn-outline" style="padding:.5rem 1.2rem;font-size:.82rem;" onclick="openModal('login')">Entrar</button>
+      <button class="btn btn-primary" style="padding:.5rem 1.2rem;font-size:.82rem;" onclick="openModal('register')">Começar Grátis</button>
+    </div>
+    <div id="topbar-user" class="hidden">
+      <div class="user-chip" onclick="goSection('solver')">
+        <div class="user-avatar" id="user-initials">U</div>
+        <span id="user-name-bar">Usuário</span>
+        <span id="plan-badge" class="tag badge-free" style="padding:.15rem .5rem;margin:0;font-size:.65rem;">Free</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LANDING ═══ -->
+<div id="landing" class="page active">
+  <div class="hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape1"></div><div class="shape shape2"></div><div class="shape shape3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-dot"></div>
+        <span>Ferramentas da Qualidade com Inteligência Artificial Real</span>
+        <div class="hero-eyebrow-dot"></div>
+      </div>
+      <h1 class="hero-title">Resolva qualquer problema<br>com a <span class="grad">ferramenta certa</span></h1>
+      <p class="hero-sub">Descreva sua dor — a IA analisa seu contexto e recomenda a melhor ferramenta da qualidade com um guia passo a passo personalizado para sua realidade.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="openModal('register')">🚀 Começar Gratuitamente</button>
+        <button class="btn btn-outline" onclick="document.getElementById('pricing-section').scrollIntoView({behavior:'smooth'})">Ver Planos</button>
+      </div>
+      <div class="hero-tools-strip">
+        <div class="tool-pill" style="color:var(--pdca);border-color:rgba(108,99,255,.4);background:rgba(108,99,255,.08)">PDCA</div>
+        <div class="tool-pill" style="color:var(--fca);border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)">FCA</div>
+        <div class="tool-pill" style="color:var(--ishikawa);border-color:rgba(255,169,77,.4);background:rgba(255,169,77,.08)">Ishikawa</div>
+        <div class="tool-pill" style="color:var(--pareto);border-color:rgba(32,201,151,.4);background:rgba(32,201,151,.08)">Pareto</div>
+        <div class="tool-pill" style="color:var(--5w2h);border-color:rgba(51,154,240,.4);background:rgba(51,154,240,.08)">5W2H</div>
+        <div class="tool-pill" style="color:var(--gut);border-color:rgba(240,101,149,.4);background:rgba(240,101,149,.08)">Matriz GUT</div>
+        <div class="tool-pill" style="color:var(--fmea);border-color:rgba(204,93,232,.4);background:rgba(204,93,232,.08)">FMEA</div>
+        <div class="tool-pill" style="color:var(--5por);border-color:rgba(116,192,252,.4);background:rgba(116,192,252,.08)">5 Porquês</div>
+        <div class="tool-pill" style="color:var(--brainstorm);border-color:rgba(105,219,124,.4);background:rgba(105,219,124,.08)">Brainstorming</div>
+        <div class="tool-pill" style="color:var(--fluxo);border-color:rgba(255,212,59,.4);background:rgba(255,212,59,.08)">Fluxograma</div>
+        <div class="tool-pill" style="color:var(--sipoc);border-color:rgba(255,135,135,.4);background:rgba(255,135,135,.08)">SIPOC</div>
+        <div class="tool-pill" style="color:var(--histograma);border-color:rgba(169,227,75,.4);background:rgba(169,227,75,.08)">Histograma</div>
+      </div>
+    </div>
+  </div>
+  <div class="features">
+    <div class="features-header">
+      <div class="tag" style="background:rgba(108,99,255,.15);color:var(--pdca)">Por que QualyTools?</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:800;margin-bottom:.8rem;">Tudo para resolver problemas com método</h2>
+      <p style="color:var(--muted);max-width:500px;margin:0 auto;font-size:.95rem;line-height:1.6;">IA real da Anthropic integrada. Não é chatbot genérico — é inteligência especializada em ferramentas da qualidade.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card" style="border-top:3px solid var(--pdca)"><div class="feat-icon">🤖</div><h3>IA Real (Claude Sonnet)</h3><p>Powered by Anthropic. Análise contextual profunda do seu problema, com recomendação e guia personalizado.</p></div>
+      <div class="feat-card" style="border-top:3px solid var(--pareto)"><div class="feat-icon">📚</div><h3>12 Ferramentas Completas</h3><p>Teoria, metodologia, exemplos reais do setor de Telecom — disponível para todos os planos.</p></div>
+      <div class="feat-card" style="border-top:3px solid var(--ishikawa)"><div class="feat-icon">🎓</div><h3>Aulas Interativas + PDF</h3><p>Cada ferramenta tem sua aula completa com quiz, caso real e exportação em PDF.</p></div>
+      <div class="feat-card" style="border-top:3px solid var(--gold)"><div class="feat-icon">📈</div><h3>PDI para Gestores</h3><p>Plano de Desenvolvimento Individual estruturado com metas, ações e acompanhamento — Plano Pro.</p></div>
+      <div class="feat-card" style="border-top:3px solid var(--5w2h)"><div class="feat-icon">🏭</div><h3>Foco em Telecom</h3><p>Casos reais: redução de churn, SLA, falhas de rede, NPS e muito mais aplicados ao setor.</p></div>
+      <div class="feat-card" style="border-top:3px solid var(--gut)"><div class="feat-icon">⚡</div><h3>Respostas em Tempo Real</h3><p>IA com streaming — veja a análise sendo gerada palavra por palavra, como um especialista ao vivo.</p></div>
+    </div>
+  </div>
+  <div class="pricing" id="pricing-section">
+    <div class="pricing-header">
+      <div class="tag" style="background:rgba(32,201,151,.15);color:var(--pareto)">Planos e Preços</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:800;margin-bottom:.8rem;">Comece grátis, escale quando quiser</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div class="price-val" style="color:var(--pareto)">R$0</div>
+        <div class="price-period">para sempre · sem cartão</div>
+        <ul class="price-features">
+          <li>IA Solver com Claude (3 consultas/dia)</li>
+          <li>Todas as 12 ferramentas + aulas completas</li>
+          <li>Exportação de aulas em PDF</li>
+          <li>Quiz de aprendizado por ferramenta</li>
+          <li class="off">IA ilimitada no Solver</li>
+          <li class="off">PDI Gestor com IA</li>
+          <li class="off">Trilha avançada de gestores</li>
+        </ul>
+        <button class="price-btn" onclick="openModal('register')">Criar conta grátis</button>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">⭐ MAIS POPULAR</div>
+        <div class="price-name">Pro</div>
+        <div class="price-val">R$47</div>
+        <div class="price-period">/mês · cancele quando quiser</div>
+        <ul class="price-features">
+          <li>IA Solver Claude ilimitado</li>
+          <li>Todas as 12 ferramentas + aulas + PDF</li>
+          <li>IA especialista dentro de cada aula</li>
+          <li>PDI Gestor completo com IA</li>
+          <li>Trilha avançada para gestores</li>
+          <li>Certificado de conclusão</li>
+          <li>Suporte prioritário</li>
+        </ul>
+        <button class="price-btn" onclick="openModal('register','pro')">Assinar Pro — R$47/mês</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="dashboard" class="page">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Principal</div>
+        <div class="sidebar-item active" id="sb-solver" onclick="goSection('solver')">
+          <div class="si-dot" style="background:var(--pdca)"></div> 🤖 IA Solver
+        </div>
+        <div class="sidebar-item" id="sb-ferramentas" onclick="goSection('ferramentas')">
+          <div class="si-dot" style="background:var(--pareto)"></div> 🛠️ Ferramentas
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conteúdo</div>
+        <div class="sidebar-item" id="sb-treinamento" onclick="goSection('treinamento')">
+          <div class="si-dot" style="background:var(--ishikawa)"></div> 🎓 Treinamento
+        </div>
+        <div class="sidebar-item" id="sb-pdi" onclick="goSection('pdi')">
+          <div class="si-dot" style="background:var(--gold)"></div> 📈 PDI Gestor
+          <span id="lock-pdi" style="margin-left:auto;font-size:.7rem;opacity:.5">🔒</span>
+        </div>
+      </div>
+      <div id="sb-upgrade-section">
+        <div style="background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(255,107,107,.1));border:1px solid rgba(108,99,255,.3);border-radius:14px;padding:1.2rem;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:.5rem">⭐</div>
+          <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem">Upgrade para Pro</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.4">IA ilimitada + PDI + trilha avançada</div>
+          <button class="btn btn-primary" style="width:100%;padding:.6rem;font-size:.82rem;" onclick="openModal('upgrade')">Assinar Pro</button>
+        </div>
+      </div>
+    </div>
+    <div class="dash-main">
+
+      <!-- SOLVER -->
+      <div class="dash-section active" id="sec-solver">
+        <div class="dash-greeting">
+          <h1>Olá, <span id="greeting-name">Usuário</span> 👋</h1>
+          <p>Descreva seu problema e a IA real vai indicar e explicar a melhor ferramenta da qualidade.</p>
+        </div>
+        <div class="dash-cards">
+          <div class="d-card"><div class="d-card-icon">🤖</div><div class="d-card-num" style="color:var(--pdca)" id="queries-used">0/3</div><div class="d-card-label">Consultas usadas hoje</div></div>
+          <div class="d-card"><div class="d-card-icon">🛠️</div><div class="d-card-num" style="color:var(--pareto)">12</div><div class="d-card-label">Ferramentas disponíveis</div></div>
+          <div class="d-card"><div class="d-card-icon">⚡</div><div class="d-card-num" style="color:var(--ishikawa)">IA</div><div class="d-card-label">Claude Sonnet ativo</div></div>
+        </div>
+        <div class="ia-box">
+          <h2>🤖 IA Solver — Qual é a sua dor?</h2>
+          <p>Descreva o problema com detalhes. A IA analisa o contexto e recomenda a combinação ideal de ferramentas com guia de aplicação personalizado.</p>
+          <div class="ia-input-row">
+            <textarea id="ia-input" placeholder="Ex: Nossa equipe de suporte tem alto índice de reincidência de falhas. O mesmo cliente liga várias vezes com o mesmo problema e não conseguimos identificar a causa raiz..."></textarea>
+            <button class="ia-send" id="ia-send-btn" onclick="runIASolver()">Analisar →</button>
+          </div>
+          <div id="ia-result-area"></div>
+        </div>
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem;">💡 Problemas frequentes em Telecom</h3>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem">
+            <div onclick="fillIAExample(0)" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:border-color .3s;font-size:.83rem;" onmouseover="this.style.borderColor='var(--pdca)'" onmouseout="this.style.borderColor='var(--border)'"><strong style="display:block;margin-bottom:.3rem">📡 Alto índice de churn</strong><span style="color:var(--muted)">Clientes cancelando pós-instalação</span></div>
+            <div onclick="fillIAExample(1)" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:border-color .3s;font-size:.83rem;" onmouseover="this.style.borderColor='var(--fca)'" onmouseout="this.style.borderColor='var(--border)'"><strong style="display:block;margin-bottom:.3rem">🔧 Reincidência de falhas</strong><span style="color:var(--muted)">Mesmo problema retornando ao suporte</span></div>
+            <div onclick="fillIAExample(2)" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:border-color .3s;font-size:.83rem;" onmouseover="this.style.borderColor='var(--ishikawa)'" onmouseout="this.style.borderColor='var(--border)'"><strong style="display:block;margin-bottom:.3rem">⏱️ SLA fora do prazo</strong><span style="color:var(--muted)">Atendimentos ultrapassando o tempo</span></div>
+            <div onclick="fillIAExample(3)" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:border-color .3s;font-size:.83rem;" onmouseover="this.style.borderColor='var(--pareto)'" onmouseout="this.style.borderColor='var(--border)'"><strong style="display:block;margin-bottom:.3rem">📊 NPS em queda</strong><span style="color:var(--muted)">Insatisfação crescente dos clientes</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FERRAMENTAS -->
+      <div class="dash-section" id="sec-ferramentas">
+        <div id="ferramentas-list">
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.4rem">🛠️ Ferramentas da Qualidade</h2>
+          <p style="color:var(--muted);font-size:.9rem;margin-bottom:2rem">Clique em qualquer ferramenta para ver teoria, passo a passo e IA integrada.</p>
+          <div class="tools-grid" id="tools-grid"></div>
+        </div>
+        <div id="ferramentas-detail" style="display:none"></div>
+      </div>
+
+      <!-- TREINAMENTO -->
+      <div class="dash-section" id="sec-treinamento">
+        <div id="training-list">
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.4rem">🎓 Trilhas de Treinamento</h2>
+          <p style="color:var(--muted);font-size:.9rem;margin-bottom:.5rem">Aulas completas sobre cada ferramenta — disponíveis para todos os planos. Abra a aula ou exporte o PDF.</p>
+          <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(32,201,151,.1);border:1px solid rgba(32,201,151,.25);border-radius:20px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:var(--pareto);margin-bottom:1.5rem">✅ Acesso completo — Free e Pro</div>
+          <div class="training-tabs">
+            <button class="training-tab active" onclick="switchTraining('colaborador',this)">👷 Colaboradores</button>
+            <button class="training-tab" onclick="switchTraining('gestor',this)">👔 Gestores</button>
+          </div>
+          <div id="training-content"></div>
+        </div>
+        <div id="training-aula" style="display:none"></div>
+      </div>
+
+      <!-- PDI -->
+      <div class="dash-section" id="sec-pdi">
+        <div id="pdi-locked" class="hidden">
+          <div style="text-align:center;padding:4rem 2rem;">
+            <div style="font-size:4rem;margin-bottom:1rem">🔒</div>
+            <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:.8rem">PDI Gestor é exclusivo do Plano Pro</h2>
+            <p style="color:var(--muted);max-width:400px;margin:0 auto 2rem;line-height:1.6">Desenvolva seu plano de crescimento com estrutura, metas e acompanhamento baseado em competências de liderança em qualidade.</p>
+            <button class="btn btn-primary" onclick="openModal('upgrade')">⭐ Assinar Pro — R$47/mês</button>
+          </div>
+        </div>
+        <div id="pdi-content"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const S = {loggedIn:false,user:null,plan:'free',queriesUsed:0,pdiActions:[false,false,false,false,false],trainingMode:'colaborador'};
+
+// ══════════════════════════════════════
+// TOOLS DATA
+// ══════════════════════════════════════
+const tools = [
+  {id:'pdca',name:'PDCA',icon:'🔄',color:'var(--pdca)',short:'Ciclo de melhoria contínua Plan-Do-Check-Act',tags:['Melhoria Contínua','Processos'],
+    when:'Quando você quer implantar uma melhoria de forma estruturada, mensurável e sustentável, garantindo que os ganhos sejam padronizados.',
+    steps:[{t:'Plan — Planejar',d:'Identifique o problema com dados, analise as causas raiz e defina metas SMART. Elabore um plano de ação detalhado (use o 5W2H).'},{t:'Do — Executar',d:'Implemente o plano em escala piloto, treine as pessoas envolvidas e colete dados durante toda a execução.'},{t:'Check — Verificar',d:'Compare os resultados obtidos com as metas planejadas utilizando indicadores previamente definidos.'},{t:'Act — Agir',d:'Se atingiu a meta, padronize e replique. Se não, ajuste o plano e reinicie o ciclo com os aprendizados.'}],
+    telecom:'Operadora com reincidência de 38% em chamados técnicos aplicou PDCA: novo script de diagnóstico + base de conhecimento compartilhada. Queda para 18% em 45 dias. Após padronização: -52% de reincidência em toda a operação.',
+    benefits:['Estrutura replicável e aprendizado organizacional','Redução de retrabalho e desperdícios','Base reconhecida para certificações ISO','Melhoria contínua e sustentável'],
+    theory:'O PDCA (Plan-Do-Check-Act) foi popularizado por W. Edwards Deming e é a espinha dorsal de qualquer sistema de gestão da qualidade. O ciclo reconhece que o conhecimento e as habilidades estão sempre incompletos — por isso, a melhoria deve ser contínua e iterativa.',
+    quiz:{q:'Em qual etapa do PDCA você deve padronizar a solução que funcionou?',opts:['Plan','Do','Check','Act'],correct:3,explanation:'Na etapa Act você age sobre os resultados: se funcionou, padroniza (SOP, procedimento); se não funcionou, volta ao Plan com os aprendizados.'}},
+
+  {id:'fca',name:'FCA',icon:'🔍',color:'var(--fca)',short:'Fato-Causa-Ação: análise estruturada de problemas',tags:['Análise','Causa Raiz'],
+    when:'Quando precisa documentar, comunicar e resolver um problema de forma objetiva, rápida e rastreável — sem misturar opinião com fato.',
+    steps:[{t:'Fato',d:'Descreva o problema objetivamente: o que aconteceu, quando, onde, com que frequência e qual o impacto mensurável.'},{t:'Causa',d:'Identifique as causas reais com questionamento estruturado. Combine com 5 Porquês para não ficar só no sintoma.'},{t:'Ação',d:'Defina ações corretivas (elimina a causa) e preventivas (evita recorrência), com responsável e prazo claros.'}],
+    telecom:'Queda de sinal recorrente em Campinas-SP. FCA: 27 chamados/semana (pico 18-22h) — saturação de backbone + roteador sem manutenção há 14 meses. Ação: substituição emergencial + manutenção trimestral. Zero recorrência nos 60 dias seguintes.',
+    benefits:['Documentação objetiva e rastreável','Separação clara entre causa e sintoma','Facilita comunicação gerencial','Histórico para análise preditiva'],
+    theory:'O FCA é uma metodologia de análise e solução de problemas criada no contexto da gestão da qualidade brasileira. Simples e poderosa, garante que a equipe olhe para o problema com os mesmos olhos antes de debater soluções — eliminando o "achismo".',
+    quiz:{q:'O que deve constar obrigatoriamente na etapa "Fato" do FCA?',opts:['A solução proposta','Dados objetivos do problema (o quê, quando, onde, frequência)','A opinião do gestor sobre a causa','O plano de ação completo'],correct:1,explanation:'O Fato deve ser 100% objetivo e baseado em dados. Misturar opiniões ou causas nesta etapa contamina toda a análise subsequente.'}},
+
+  {id:'ishikawa',name:'Ishikawa',icon:'🐟',color:'var(--ishikawa)',short:'Diagrama de Causa e Efeito — Espinha de Peixe',tags:['Causa Raiz','Visual'],
+    when:'Quando precisa mapear visualmente TODAS as possíveis causas de um problema antes de partir para dados — especialmente útil em brainstormings de equipe.',
+    steps:[{t:'Defina o Efeito',d:'Escreva o problema na "cabeça do peixe". Seja específico: não "qualidade ruim", mas "taxa de reincidência de 38%".'},{t:'Desenhe as Espinhas',d:'Crie as 6 categorias (6M): Mão de obra, Máquina, Método, Material, Medição, Meio ambiente.'},{t:'Brainstorm por Categoria',d:'Para cada M, liste todas as causas possíveis sem julgamento. Quantidade antes de qualidade.'},{t:'Analise e Priorize',d:'Vote nas causas mais prováveis. Valide com dados antes de atacar.'}],
+    telecom:'Alta taxa de abandono na URA (menu de atendimento automático). Ishikawa mapeou 34 causas. As 3 principais respondiam por 71% dos abandonos: menu confuso, espera >3min, opções sem saída para humano. Redesign reduziu abandono em 44%.',
+    benefits:['Visão completa de todas as causas possíveis','Engajamento e alinhamento da equipe','Evita foco no sintoma','Base para análise de Pareto'],
+    theory:'Criado pelo professor Kaoru Ishikawa nos anos 60 na Japão, o diagrama ficou conhecido como "Espinha de Peixe" por sua forma visual. É uma das 7 ferramentas básicas da qualidade e ponto de partida em qualquer metodologia de solução de problemas estruturada.',
+    quiz:{q:'Quantas categorias principais (os "M") o Diagrama de Ishikawa clássico possui?',opts:['4','5','6','8'],correct:2,explanation:'O Ishikawa clássico usa 6M: Mão de obra, Máquina, Método, Material, Medição e Meio ambiente. Algumas variações incluem mais M, mas os 6M são o padrão.'}},
+
+  {id:'pareto',name:'Pareto',icon:'📊',color:'var(--pareto)',short:'Princípio 80/20: priorize o que realmente importa',tags:['Priorização','Dados'],
+    when:'Quando você tem múltiplos problemas ou causas e precisa saber objetivamente onde concentrar esforços para obter o maior resultado possível.',
+    steps:[{t:'Colete os Dados',d:'Liste todos os problemas ou causas com sua frequência ou impacto financeiro.'},{t:'Ordene Decrescente',d:'Classifique do maior para o menor impacto/frequência.'},{t:'Calcule % Acumulado',d:'Some os percentuais para identificar os itens que chegam a 80% do problema total.'},{t:'Construa o Gráfico',d:'Barras ordenadas + linha de % acumulado. Os itens antes da linha dos 80% são sua prioridade.'}],
+    telecom:'2.847 chamados em 30 dias analisados. Pareto revelou: 3 categorias (modem sem sinal, lentidão, Wi-Fi instável) = 79% de todos os chamados. Foco exclusivo nessas 3 reduziu o volume total em 41% em 90 dias.',
+    benefits:['Foco onde o resultado é máximo','Otimização de recursos escassos','Evita desperdício em causas menores','Comunicação visual clara para executivos'],
+    theory:'O Princípio de Pareto foi observado pelo economista Vilfredo Pareto em 1896 e aplicado à qualidade por Joseph Juran. A regra 80/20 afirma que aproximadamente 80% dos efeitos vêm de 20% das causas — válida em praticamente todos os contextos operacionais.',
+    quiz:{q:'Qual é o objetivo principal do Diagrama de Pareto?',opts:['Encontrar a causa raiz de um problema','Priorizar as causas que mais contribuem para o problema','Mapear o fluxo de um processo','Medir a capacidade de um processo'],correct:1,explanation:'O Pareto é uma ferramenta de PRIORIZAÇÃO, não de causa raiz. Ele responde "onde agir primeiro?" — não "por quê está acontecendo?". Use Ishikawa ou 5 Porquês para a causa raiz.'}},
+
+  {id:'5w2h',name:'5W2H',icon:'📋',color:'var(--5w2h)',short:'Plano de ação completo: 7 perguntas que eliminam lacunas',tags:['Plano de Ação','Execução'],
+    when:'Quando precisa transformar uma decisão em plano de ação executável — sem deixar nenhuma dúvida sobre o que, por quê, quem, quando, onde, como e quanto custa.',
+    steps:[{t:'What — O quê?',d:'Descreva a ação específica a ser executada. Evite verbos genéricos como "melhorar".'},{t:'Why — Por quê?',d:'Qual objetivo ou problema a ação resolve? Qual indicador ela vai mover?'},{t:'Who — Quem?',d:'Nome do responsável. Uma pessoa, não um departamento.'},{t:'When — Quando?',d:'Data de início E data de conclusão. Marcos intermediários se necessário.'},{t:'Where — Onde?',d:'Área, sistema, unidade ou localidade onde a ação será executada.'},{t:'How — Como?',d:'Passos concretos de implementação. Quanto mais específico, melhor.'},{t:'How much — Quanto?',d:'Recursos financeiros e humanos necessários. Zero também é uma resposta válida.'}],
+    telecom:'Processo de ativação de fibra com alto churn D30 (12%). 5W2H estruturou implantação de kit pré-configurado + ligação proativa D+1. Meta: reduzir churn para 6%. Atingida em 52 dias com 100% das ações rastreadas.',
+    benefits:['Elimina ambiguidade na comunicação','Garante alinhamento de expectativas','Facilita monitoramento de execução','Documentação profissional e auditável'],
+    theory:'O 5W2H é uma metodologia japonesa de planejamento de ações derivada do método 5W1H (sem o "How Much"). Amplamente usada no sistema de gestão Toyota e em empresas de manufatura e serviços ao redor do mundo. Simples, mas extremamente eficaz para garantir que nada fique no ar.',
+    quiz:{q:'No 5W2H, a pergunta "Who?" deve ser respondida com:',opts:['Um departamento (ex: TI, Operações)','O nome de uma pessoa responsável','Todos os envolvidos no projeto','O cliente que solicitou a ação'],correct:1,explanation:'A atribuição deve ser a uma pessoa, não a um departamento. "O departamento de TI" não sente pressão por resultado; "João Silva, analista de TI" sim. Responsabilidade individual gera accountability.'}},
+
+  {id:'gut',name:'Matriz GUT',icon:'🎯',color:'var(--gut)',short:'Priorize com critério: Gravidade × Urgência × Tendência',tags:['Priorização','Decisão'],
+    when:'Quando você tem múltiplos problemas simultâneos e a equipe não consegue chegar a um consenso sobre qual atacar primeiro — a GUT decide de forma objetiva.',
+    steps:[{t:'Liste os Problemas',d:'Mapeie todos os problemas, riscos ou oportunidades que estão na mesa.'},{t:'Gravidade (G)',d:'Qual o impacto se o problema não for resolvido? Escala 1-5 (1=mínimo, 5=catastrófico).'},{t:'Urgência (U)',d:'Quanto tempo temos antes que o problema piore? Escala 1-5 (1=sem pressa, 5=imediato).'},{t:'Tendência (T)',d:'O problema vai piorar se não agirmos? Escala 1-5 (1=vai desaparecer, 5=vai piorar muito).'},{t:'Calcule e Priorize',d:'Multiplique G×U×T. O maior score é a prioridade #1. Organize em ranking e comunique as decisões.'}],
+    telecom:'8 problemas simultâneos em uma operação regional. GUT identificou "desconexões em horário nobre" com score 125 (G5×U5×T5) como prioridade máxima. Foco nesse problema único gerou resolução em 20 dias com impacto direto de +8 pontos no NPS.',
+    benefits:['Decisão baseada em critérios objetivos','Gera consenso em equipes com visões diferentes','Visualização clara de prioridades','Comunicação executiva eficiente'],
+    theory:'A Matriz GUT foi desenvolvida por Charles H. Kepner e Benjamin B. Tregoe na década de 60 como parte da metodologia de análise e solução de problemas. É uma das ferramentas mais práticas para tomada de decisão em gestão, especialmente quando os recursos são limitados.',
+    quiz:{q:'Uma situação com G=5, U=3 e T=4 terá qual score na Matriz GUT?',opts:['12','47','60','120'],correct:2,explanation:'Score GUT = G × U × T = 5 × 3 × 4 = 60. A multiplicação (não a soma) amplifica a diferença entre problemas críticos e problemas menores, tornando a priorização mais precisa.'}},
+
+  {id:'fmea',name:'FMEA',icon:'⚠️',color:'var(--fmea)',short:'Previna antes de remediar: Análise de Modos de Falha e Efeitos',tags:['Risco','Prevenção'],
+    when:'Quando você quer ser proativo — identificar e bloquear falhas ANTES que elas ocorram, especialmente em novos processos ou mudanças críticas.',
+    steps:[{t:'Mapeie o Processo',d:'Liste todas as etapas ou componentes do processo/produto que será analisado.'},{t:'Modos de Falha',d:'Para cada etapa, pergunte: "De que formas isso pode falhar?" Liste todos os modos.'},{t:'Efeitos e Severidade (S)',d:'Qual o impacto de cada falha? Nota 1-10 (10=parada total ou risco de vida).'},{t:'Causas e Ocorrência (O)',d:'Com que frequência essa causa pode ocorrer? Nota 1-10 (10=quase certo).'},{t:'Detecção (D)',d:'Qual a probabilidade de detectar a falha antes que chegue ao cliente? Nota 1-10 (10=impossível detectar).'},{t:'NPR e Plano de Ação',d:'NPR = S×O×D. NPR>100 exige ação imediata. Defina responsável e prazo.'}],
+    telecom:'FMEA na portabilidade numérica: 23 modos de falha mapeados. NPR mais crítico: erro de cadastro com NPR=288 (S8×O6×D6). Validação automática via API reduziu falhas em 67% e eliminou 3,2h de retrabalho por dia.',
+    benefits:['Prevenção é mais barata que correção','Reduz custos de garantia e retrabalho','Base obrigatória para certificações automotivas e industriais','Gera visibilidade do risco para a liderança'],
+    theory:'O FMEA (Failure Mode and Effects Analysis) foi desenvolvido pela NASA nos anos 60 para o programa Apollo e depois adotado pela indústria automotiva (Ford, GM). Hoje é obrigatório em normas como IATF 16949 e é uma das ferramentas mais avançadas de qualidade preventiva.',
+    quiz:{q:'Se uma falha tem Severidade=9, Ocorrência=8 e Detecção=7, qual é o NPR e a situação?',opts:['NPR=24, situação controlada','NPR=504, ação imediata necessária','NPR=504, monitorar','NPR=24, ação imediata'],correct:1,explanation:'NPR = 9×8×7 = 504. NPR acima de 100 já exige ação — 504 é extremamente crítico. A alta severidade combinada com alta ocorrência e baixa detecção representa risco grave ao processo.'}},
+
+  {id:'5por',name:'5 Porquês',icon:'❓',color:'var(--5por)',short:'Método simples e poderoso para encontrar a causa raiz real',tags:['Causa Raiz','Análise'],
+    when:'Quando você tem um problema específico e bem definido e precisa chegar à causa raiz sistêmica rapidamente — sem equipamentos ou análises complexas.',
+    steps:[{t:'Defina o Problema',d:'Escreva o problema de forma clara e objetiva com dados. "Muitas reclamações" é vago; "38% de reincidência em chamados" é preciso.'},{t:'Pergunte "Por quê?" #1',d:'Por que esse problema está ocorrendo? Registre a resposta.'},{t:'Pergunte "Por quê?" #2 ao #4',d:'Continue perguntando "por quê?" para cada resposta anterior. Vá fundo, não aceite respostas superficiais.'},{t:'Pergunte "Por quê?" #5',d:'O 5º porquê geralmente revela a causa raiz sistêmica — um processo, sistema ou falta de padrão.'},{t:'Defina a Ação Corretiva',d:'Ataque a causa raiz do 5º porquê, não o sintoma inicial. Valide se a ação realmente bloqueia a causa.'}],
+    telecom:'TMA (tempo médio de atendimento) de 18 min para solucionar falha simples. 5 Porquês revelou no 5º nível: ausência de middleware integrando 3 sistemas legados, obrigando atendente a navegar em 3 telas. Solução: API de integração. TMA caiu de 18 para 8 min.',
+    benefits:['Zero custo de implementação','Resultado em 15-30 minutos','Acessível a qualquer nível hierárquico','Quebra o ciclo vicioso de tratar sintomas'],
+    theory:'Os 5 Porquês foram desenvolvidos por Sakichi Toyoda e integram o Sistema Toyota de Produção (TPS). A premissa é simples: problemas superficiais têm causas mais profundas. Cinco níveis de questionamento são tipicamente suficientes para chegar à raiz — embora o número ideal varie por problema.',
+    quiz:{q:'Qual é o principal objetivo dos 5 Porquês?',opts:['Gerar soluções criativas em equipe','Chegar à causa raiz e não ficar no sintoma','Priorizar problemas por impacto','Mapear todos os riscos de um processo'],correct:1,explanation:'O objetivo é sair do sintoma e encontrar a causa raiz sistêmica. Sem esse aprofundamento, as ações tratam o sintoma e o problema retorna — o clássico "apagar incêndio" que nunca termina.'}},
+
+  {id:'brainstorm',name:'Brainstorming',icon:'💡',color:'var(--brainstorm)',short:'Geração criativa de ideias estruturada para resolver problemas',tags:['Criatividade','Equipe'],
+    when:'Quando você precisa gerar muitas alternativas de solução antes de decidir — ou quando o problema exige sair do padrão e pensar fora da caixa.',
+    steps:[{t:'Prepare a Sessão',d:'5-8 participantes ideais, facilitador neutro, sala com quadro ou post-its, regras claras desde o início.'},{t:'Apresente o Problema',d:'Contextualize com dados: o que está acontecendo, qual o impacto, o que já foi tentado.'},{t:'Geração Livre',d:'Quantidade antes de qualidade. NENHUMA crítica durante a geração. 15-30 minutos. Todos falam, tudo é registrado.'},{t:'Consolide',d:'Agrupe ideias similares, elimine duplicatas, crie categorias.'},{t:'Vote e Decida',d:'Multivoto: cada participante tem 3-5 votos. As ideias mais votadas viram plano de ação.'}],
+    telecom:'47 ideias geradas em 30 minutos para reduzir tempo de instalação de fibra. Ideia vencedora: kit pré-configurado enviado antes da visita técnica. Resultado: instalação de 4h para 2h15 — redução de 44% no tempo.',
+    benefits:['Engajamento e senso de pertencimento da equipe','Soluções criativas que a hierarquia normalmente bloqueia','Quebra de paradigmas e silos departamentais','Funciona como diagnóstico e geração de solução ao mesmo tempo'],
+    theory:'O Brainstorming foi criado por Alex Osborn em 1939 e popularizado em seu livro "Applied Imagination" (1953). A regra de ouro é o adiamento do julgamento: críticas durante a geração bloqueiam o pensamento criativo. Quantidade de ideias aumenta a probabilidade de encontrar soluções inovadoras.',
+    quiz:{q:'Durante a fase de geração do Brainstorming, o facilitador deve:',opts:['Avaliar e filtrar as ideias conforme surgem','Registrar todas as ideias sem nenhum julgamento','Dar mais tempo para ideias mais elaboradas','Permitir críticas construtivas entre os participantes'],correct:1,explanation:'A regra #1 do Brainstorming é: ZERO julgamento durante a geração. Críticas — mesmo "construtivas" — bloqueiam a criatividade dos participantes e reduzem a quantidade e qualidade das ideias geradas.'}},
+
+  {id:'fluxo',name:'Fluxograma',icon:'🗺️',color:'var(--fluxo)',short:'Mapeie processos visualmente para identificar gargalos e falhas',tags:['Processos','Visual'],
+    when:'Quando precisa entender, documentar ou melhorar um processo de ponta a ponta — especialmente quando há múltiplos sistemas, departamentos ou decisões envolvidas.',
+    steps:[{t:'Defina o Escopo',d:'Estabeleça claramente o início, fim, entradas e saídas do processo. Não tente mapear tudo de uma vez.'},{t:'Liste as Etapas',d:'Entreviste quem executa o processo (não quem acha que sabe). Registre o que realmente acontece, não o ideal.'},{t:'Aplique a Simbologia',d:'Retângulo=atividade, Losango=decisão (sim/não), Oval=início/fim, Seta=fluxo, Paralelogramo=entrada/saída.'},{t:'Valide com a Equipe',d:'Apresente para quem executa o processo. Corrija discrepâncias.'},{t:'Analise e Melhore',d:'Identifique loops de retrabalho, decisões sem critério, etapas duplicadas e handoffs desnecessários.'}],
+    telecom:'Processo de reclamação de cobrança tinha 27 etapas e usava 4 sistemas diferentes. Redesign baseado no fluxograma: 14 etapas, 2 sistemas, resolução em 1 contato (First Call Resolution). NPS do processo subiu 31 pontos.',
+    benefits:['Visibilidade total do processo real','Identifica desperdícios e gargalos que ninguém enxerga','Facilita treinamento de novos colaboradores','Base indispensável para automação e melhoria'],
+    theory:'O Fluxograma como ferramenta de negócios foi popularizado por Frank Gilbreth em 1921 e depois incorporado às 7 ferramentas básicas da qualidade. Em metodologias como Six Sigma e Lean, o mapeamento de processos (VSM, swimlane) é sempre o ponto de partida para qualquer projeto de melhoria.',
+    quiz:{q:'Qual símbolo representa uma decisão (ponto de escolha) em um fluxograma?',opts:['Retângulo','Círculo','Losango','Oval'],correct:2,explanation:'O Losango (diamante) representa pontos de decisão — bifurcações no fluxo com respostas Sim/Não ou múltiplas opções. O Retângulo representa atividades, o Oval representa início/fim e o Paralelogramo representa entradas/saídas.'}},
+
+  {id:'sipoc',name:'SIPOC',icon:'🔗',color:'var(--sipoc)',short:'Visão macro do processo: Suppliers, Inputs, Process, Outputs, Customers',tags:['Processos','Six Sigma'],
+    when:'Quando você precisa de uma visão de alto nível do processo antes de aprofundar — especialmente útil no início de projetos Lean ou Six Sigma.',
+    steps:[{t:'Suppliers — Fornecedores',d:'Quem fornece os insumos e informações necessárias para o processo funcionar?'},{t:'Inputs — Entradas',d:'Quais recursos, dados, materiais ou informações são necessários como entrada?'},{t:'Process — Processo',d:'As 5-7 macro-etapas do processo (nível alto, não o detalhamento).'},{t:'Outputs — Saídas',d:'O que o processo produz? Quais são os entregáveis concretos?'},{t:'Customers — Clientes',d:'Quem são os destinatários das saídas? Clientes internos e externos.'}],
+    telecom:'SIPOC do processo de ativação de Internet revelou gargalo crítico nos Inputs: 3 sistemas de cadastro (CRM, ERP, sistema de campo) gerando inconsistências. Integração via API eliminou o problema: falhas caíram de 23% para 4% em 60 dias.',
+    benefits:['Alinhamento rápido de toda a equipe','Identifica interfaces e dependências críticas','Ponto de partida obrigatório em Six Sigma DMAIC','Facilita comunicação com stakeholders e liderança'],
+    theory:'O SIPOC é uma ferramenta da metodologia Six Sigma, usada na fase Define do DMAIC. Criada para garantir que todos os stakeholders tenham a mesma visão macro do processo antes de mergulhar em análises detalhadas, evitando o erro de otimizar a parte errada do sistema.',
+    quiz:{q:'Em qual fase do Six Sigma DMAIC o SIPOC é tipicamente utilizado?',opts:['Measure (Medir)','Analyze (Analisar)','Define (Definir)','Improve (Melhorar)'],correct:2,explanation:'O SIPOC é usado na fase DEFINE do DMAIC. Seu objetivo é estabelecer o escopo e dar visão macro antes de qualquer medição ou análise — garantindo que todo o time está alinhado sobre o que está sendo estudado.'}},
+
+  {id:'histograma',name:'Histograma',icon:'📈',color:'var(--histograma)',short:'Distribuição de frequência para revelar padrões e variações',tags:['Dados','Estatística'],
+    when:'Quando você tem dados históricos de um processo e precisa entender sua distribuição, variação e se ele está dentro das especificações.',
+    steps:[{t:'Colete os Dados',d:'Mínimo 50 medições do processo. Quanto mais, melhor a representatividade estatística.'},{t:'Calcule a Amplitude',d:'Amplitude = Maior valor - Menor valor. Defina 6 a 15 classes (intervalos).'},{t:'Distribua os Dados',d:'Conte quantas medições caem em cada classe. Crie a tabela de frequência.'},{t:'Construa o Gráfico',d:'Eixo X = intervalos de valores, Eixo Y = frequência. Barras adjacentes sem espaço.'},{t:'Interprete o Formato',d:'Normal/Gaussiana (processo estável), Bimodal (dois grupos), Assimétrica (tendência). Compare com os limites de especificação.'}],
+    telecom:'Histograma de 1.200 chamadas revelou distribuição bimodal: picos em 3-4 min e 12-14 min. Indicava dois grupos distintos de atendentes com métodos diferentes. Padronização do método mais eficiente: TMA médio caiu de 8,2 para 5,7 min (-31%).',
+    benefits:['Revela a realidade dos dados de forma visual','Identifica variação e instabilidade do processo','Detecta padrões ocultos (bimodalidade, assimetria)','Base para análise de capabilidade (Six Sigma)'],
+    theory:'O Histograma foi desenvolvido por Karl Pearson em 1895 e é uma das 7 ferramentas básicas da qualidade. Ele transforma dados brutos em distribuição visual, permitindo identificar se um processo é estável, previsível e capaz de atender às especificações dos clientes.',
+    quiz:{q:'Um histograma bimodal (dois picos) tipicamente indica:',opts:['Processo estável e sob controle','Dois grupos ou fontes distintos nos dados','Problema de coleta de dados','Processo dentro da especificação'],correct:1,explanation:'Bimodalidade indica que os dados vêm de duas populações diferentes — dois turnos, dois equipamentos, dois operadores com métodos distintos. É um sinal de que o processo não é homogêneo e precisa ser investigado.'}}
+];
+
+// ══════════════════════════════════════
+// TRAINING DATA (mapeia para tools)
+// ══════════════════════════════════════
+const trainingData = {
+  colaborador:[
+    {toolId:'pdca',title:'PDCA na Prática',level:'Iniciante',dur:'1h 30min',mod:5,prog:0,desc:'Ciclo de melhoria contínua com exercícios práticos baseados em situações reais de Telecom.'},
+    {toolId:'fca',title:'FCA — Análise Estruturada',level:'Iniciante',dur:'1h',mod:4,prog:0,desc:'Como documentar e resolver problemas de forma objetiva, sem confundir fato com opinião.'},
+    {toolId:'ishikawa',title:'Ishikawa e Espinha de Peixe',level:'Iniciante',dur:'1h 15min',mod:5,prog:0,desc:'Mapeamento visual de causas. Como conduzir o brainstorming por categoria com sua equipe.'},
+    {toolId:'5por',title:'5 Porquês — Causa Raiz',level:'Iniciante',dur:'45min',mod:3,prog:0,desc:'Técnica simples e poderosa. Aprenda a ir fundo nos problemas sem precisar de dados complexos.'},
+    {toolId:'5w2h',title:'5W2H — Plano de Ação',level:'Intermediário',dur:'1h',mod:4,prog:0,desc:'Como transformar uma decisão em plano executável sem lacunas ou ambiguidades.'},
+    {toolId:'brainstorm',title:'Brainstorming Estruturado',level:'Intermediário',dur:'1h',mod:4,prog:0,desc:'Gere ideias criativas com sua equipe de forma estruturada e produtiva.'}
+  ],
+  gestor:[
+    {toolId:'gut',title:'Matriz GUT — Priorização',level:'Gestor',dur:'1h',mod:4,prog:0,desc:'Tome decisões de priorização baseadas em critérios objetivos. Elimine o "achismo" gerencial.'},
+    {toolId:'pareto',title:'Pareto e o Princípio 80/20',level:'Gestor',dur:'1h 15min',mod:5,prog:0,desc:'Como usar dados para focar esforços onde o impacto é máximo. Comunicação visual executiva.'},
+    {toolId:'fmea',title:'FMEA — Gestão de Riscos',level:'Avançado',dur:'2h',mod:7,prog:0,desc:'Antecipe falhas antes que aconteçam. Metodologia avançada de prevenção com NPR.'},
+    {toolId:'fluxo',title:'Fluxograma de Processos',level:'Gestor',dur:'1h 30min',mod:5,prog:0,desc:'Mapeie e melhore processos de ponta a ponta. Identifique gargalos e retrabalho.'},
+    {toolId:'sipoc',title:'SIPOC e Visão Sistêmica',level:'Avançado',dur:'1h 15min',mod:5,prog:0,desc:'Ferramenta essencial do Six Sigma para alinhar stakeholders e escopo de projetos.'},
+    {toolId:'histograma',title:'Histograma e Análise de Dados',level:'Avançado',dur:'1h 30min',mod:6,prog:0,desc:'Interprete distribuições de dados para revelar padrões ocultos e variação de processos.'}
+  ]
+};
+
+// ══════════════════════════════════════
+// API CLAUDE — STREAMING
+// ══════════════════════════════════════
+async function callClaude(sys,userMsg,onChunk,onDone){
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,stream:true,system:sys,messages:[{role:"user",content:userMsg}]})
+    });
+    if(!r.ok) throw new Error("API "+r.status);
+    const reader=r.body.getReader(),dec=new TextDecoder();
+    let buf="";
+    while(true){
+      const{done,value}=await reader.read();
+      if(done) break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n"); buf=lines.pop();
+      for(const ln of lines){
+        if(!ln.startsWith("data: ")) continue;
+        const d=ln.slice(6).trim();
+        if(d==="[DONE]") continue;
+        try{const p=JSON.parse(d);if(p.type==="content_block_delta"&&p.delta?.text)onChunk(p.delta.text);if(p.type==="message_stop"){onDone();return;}}catch(e){}
+      }
+    }
+    onDone();
+  }catch(err){onDone("Erro ao conectar com a IA.");}
+}
+
+function fmt(txt){
+  return txt
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^### (.+)$/gm,'<div style="font-family:Syne,sans-serif;font-size:1rem;font-weight:800;color:var(--gold);margin:.8rem 0 .3rem">$1</div>')
+    .replace(/^## (.+)$/gm,'<div style="font-family:Syne,sans-serif;font-size:1.05rem;font-weight:800;color:var(--pdca);margin:.8rem 0 .3rem">$1</div>')
+    .replace(/^- (.+)$/gm,'<div style="display:flex;gap:.5rem;margin:.2rem 0"><span style="color:var(--pdca);font-weight:800;flex-shrink:0">▸</span><span>$1</span></div>');
+}
+
+// ══════════════════════════════════════
+// IA SOLVER
+// ══════════════════════════════════════
+const exampleProblems=[
+  "Nossos clientes estão cancelando os planos em grande quantidade logo após a instalação. O churn nos primeiros 30 dias está em 15% e não conseguimos identificar o motivo principal.",
+  "O mesmo cliente liga repetidamente com o mesmo problema de conexão. Nossa taxa de reincidência de falhas está em 40% e o custo de suporte está absurdo.",
+  "Nossos técnicos estão estourando o SLA constantemente. O tempo de atendimento está 3x acima do contratado e não sei onde está o gargalo.",
+  "Nosso NPS caiu 18 pontos nos últimos 3 meses. Os clientes dizem que o atendimento é ruim mas temos muitas reclamações diferentes e não sabemos por onde começar."
+];
+function fillIAExample(i){document.getElementById('ia-input').value=exampleProblems[i];}
+
+async function runIASolver(){
+  const inp=document.getElementById('ia-input').value.trim();
+  if(!inp){alert('Descreva seu problema primeiro!');return;}
+  if(S.plan==='free'&&S.queriesUsed>=3){openModal('upgrade');return;}
+  const btn=document.getElementById('ia-send-btn');
+  btn.disabled=true;btn.textContent='⏳ Analisando...';
+  const ra=document.getElementById('ia-result-area');
+  ra.innerHTML=`<div class="ia-stream-box" style="margin-top:1.5rem"><div class="ia-stream-header"><div class="ia-stream-icon">🤖</div><div><div class="ia-stream-title">Analisando seu problema...</div><div class="ia-stream-sub">Claude Sonnet • Especialista em Qualidade</div></div></div><div class="typing-dots" id="typing-ind"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div><div class="ia-stream-content" id="stream-output"></div></div>`;
+  S.queriesUsed++;
+  document.getElementById('queries-used').textContent=S.plan==='pro'?'∞':S.queriesUsed+'/3';
+  const sys=`Você é especialista sênior em Ferramentas da Qualidade no setor Telecom. Analise o problema e: 1) Recomende a combinação ideal de ferramentas 2) Explique por quê cada uma 3) Dê passo a passo de aplicação 4) Exemplo Telecom 5) Dica de ouro. Use **negrito**. Máximo 600 palavras.`;
+  let full="";const out=document.getElementById('stream-output');const ti=document.getElementById('typing-ind');
+  await callClaude(sys,`Problema: ${inp}. Recomende ferramentas da qualidade e como aplicar.`,
+    c=>{ti&&(ti.style.display='none');full+=c;out.innerHTML=fmt(full)+'<span class="cursor-blink"></span>';},
+    ()=>{out.innerHTML=fmt(full);btn.disabled=false;btn.textContent='Analisar →';
+      if(S.plan==='free') ra.innerHTML+=`<div style="margin-top:1rem;padding:1rem;background:rgba(108,99,255,.1);border-radius:10px;border:1px solid rgba(108,99,255,.2);font-size:.83rem;color:var(--muted)">${3-S.queriesUsed} consultas restantes hoje. <a onclick="openModal('upgrade')" style="color:var(--pdca);cursor:pointer;font-weight:700">Assine Pro para ilimitado →</a></div>`;
+    }
+  );
+}
+
+// ══════════════════════════════════════
+// FERRAMENTAS
+// ══════════════════════════════════════
+function renderTools(){
+  const g=document.getElementById('tools-grid');
+  if(!g) return;
+  g.innerHTML=tools.map(t=>`
+    <div class="tool-card" onclick="openTool('${t.id}')">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${t.color};border-radius:16px 16px 0 0"></div>
+      <div class="tool-card-icon">${t.icon}</div>
+      <div class="tool-card-name">${t.name}</div>
+      <div class="tool-card-desc">${t.short}</div>
+      <div class="tool-card-tags">${t.tags.map(tg=>`<span class="tool-card-tag" style="background:${t.color}20;color:${t.color}">${tg}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function openTool(id){
+  const t=tools.find(x=>x.id===id);if(!t) return;
+  const det=document.getElementById('ferramentas-detail');
+  document.getElementById('ferramentas-list').style.display='none';
+  det.style.display='block';
+  det.innerHTML=`
+    <div class="tool-back" onclick="closeTool()">← Voltar às ferramentas</div>
+    <div class="tool-hero" style="background:linear-gradient(135deg,${t.color}22,${t.color}06);border:1px solid ${t.color}40">
+      <div style="font-size:3rem;margin-bottom:.8rem">${t.icon}</div>
+      <h1>${t.name}</h1><p>${t.short}</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem">${t.tags.map(tg=>`<span style="background:${t.color}25;color:${t.color};padding:.3rem .8rem;border-radius:20px;font-size:.72rem;font-weight:700">${tg}</span>`).join('')}</div>
+    </div>
+    <div class="tool-content-grid">
+      <div>
+        <div class="content-card"><h3>📌 Quando Usar</h3><p>${t.when}</p></div>
+        <div class="content-card"><h3>🔢 Passo a Passo</h3><div class="steps-visual">${t.steps.map((s,i)=>`<div class="step-item"><div class="step-circle" style="background:${t.color};color:#fff">${i+1}</div><div class="step-text"><strong>${s.t}</strong><span>${s.d}</span></div></div>`).join('')}</div></div>
+        <div class="case-study"><h3 style="color:var(--pareto);font-size:1rem;font-weight:800;margin-bottom:.8rem">📡 Caso Real — Telecom</h3><div class="case-telecom"><h4>Situação & Resultado</h4><p style="font-size:.85rem;line-height:1.6">${t.telecom}</p></div></div>
+        <div class="content-card"><h3>✅ Benefícios</h3><ul>${t.benefits.map(b=>`<li>${b}</li>`).join('')}</ul></div>
+      </div>
+      <div>
+        <div class="ia-tool-chat">
+          <h3>🤖 IA Especialista — ${t.name}</h3>
+          <p>Descreva sua situação e a IA explica como aplicar ${t.name} no seu contexto real.</p>
+          <textarea class="ia-tool-input" id="tool-ia-input-${t.id}" placeholder="Ex: Tenho um problema de ${t.tags[0].toLowerCase()} na minha equipe de telecom..."></textarea>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:.85rem;padding:.75rem" id="tool-ia-btn-${t.id}" onclick="runToolIA('${t.id}')">Consultar IA sobre ${t.name} →</button>
+          <div id="tool-ia-result-${t.id}" style="margin-top:1rem"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function runToolIA(toolId){
+  const t=tools.find(x=>x.id===toolId);
+  const inp=document.getElementById(`tool-ia-input-${toolId}`).value.trim();
+  if(!inp){alert('Descreva sua situação!');return;}
+  const btn=document.getElementById(`tool-ia-btn-${toolId}`);
+  btn.disabled=true;btn.textContent='⏳ Consultando IA...';
+  const re=document.getElementById(`tool-ia-result-${toolId}`);
+  re.innerHTML=`<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div><div class="ai-suggestion" id="ts-${toolId}"></div>`;
+  let full="";const se=document.getElementById(`ts-${toolId}`);const te=re.querySelector('.typing-dots');
+  await callClaude(`Especialista em ${t.name} no setor Telecom. Explique como aplicar ${t.name} para a situação descrita. Prático, com exemplos. Máximo 400 palavras. Use **negrito**.`,
+    `Minha situação com ${t.name}: ${inp}`,
+    c=>{te&&(te.style.display='none');full+=c;se.innerHTML=fmt(full)+'<span class="cursor-blink"></span>';},
+    ()=>{se.innerHTML=fmt(full);btn.disabled=false;btn.textContent=`Consultar IA sobre ${t.name} →`;}
+  );
+}
+function closeTool(){document.getElementById('ferramentas-detail').style.display='none';document.getElementById('ferramentas-list').style.display='block';}
+
+// ══════════════════════════════════════
+// TREINAMENTO — LISTA
+// ══════════════════════════════════════
+function switchTraining(mode,btn){
+  S.trainingMode=mode;
+  document.querySelectorAll('.training-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTrainingList(mode);
+}
+
+function renderTrainingList(mode='colaborador'){
+  const data=trainingData[mode];
+  const c=document.getElementById('training-content');
+  if(!c) return;
+  c.innerHTML=`<div class="training-grid">${data.map(m=>{
+    const t=tools.find(x=>x.id===m.toolId);
+    const color=t?t.color:'var(--pdca)';
+    return `<div class="training-card" style="border-top:3px solid ${color}">
+      <div class="training-level" style="color:${color}">${m.level}</div>
+      <h3>${m.title}</h3>
+      <p>${m.desc}</p>
+      <div class="training-meta"><span>⏱️ ${m.dur}</span><span>📚 ${m.mod} módulos</span></div>
+      <div class="training-progress"><div class="training-progress-bar" style="width:${m.prog}%;background:${color}"></div></div>
+      <div class="training-btn-row">
+        <button class="training-btn training-btn-open" style="background:${color}" onclick="openAula('${m.toolId}')">▶️ Abrir Aula</button>
+        <button class="training-btn training-btn-pdf" onclick="exportPDF('${m.toolId}')">📄 Exportar PDF</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ══════════════════════════════════════
+// TREINAMENTO — AULA INTERNA
+// ══════════════════════════════════════
+function openAula(toolId){
+  const t=tools.find(x=>x.id===toolId);if(!t) return;
+  document.getElementById('training-list').style.display='none';
+  const aw=document.getElementById('training-aula');
+  aw.style.display='block';
+  const quiz=t.quiz;
+  aw.innerHTML=`
+    <div class="aula-wrap">
+      <div class="aula-back" onclick="closeAula()">← Voltar às trilhas</div>
+      <div class="aula-header" style="background:linear-gradient(135deg,${t.color}20,${t.color}06);border:1px solid ${t.color}40">
+        <div style="font-size:3rem;margin-bottom:.5rem">${t.icon}</div>
+        <h1>${t.name}</h1>
+        <p>${t.short}</p>
+        <div class="aula-header-meta">
+          <div class="aula-meta-item">📚 Teoria completa</div>
+          <div class="aula-meta-item">🔢 Passo a passo</div>
+          <div class="aula-meta-item">📡 Caso real Telecom</div>
+          <div class="aula-meta-item">🧠 Quiz de fixação</div>
+          <div class="aula-meta-item">🤖 IA integrada</div>
+        </div>
+        <button class="aula-export-btn" onclick="exportPDF('${t.id}')">📄 Exportar esta aula em PDF</button>
+      </div>
+
+      <div class="aula-body">
+        <div class="aula-main">
+
+          <div class="aula-section">
+            <h2 style="color:${t.color}">📖 Teoria e Fundamentos</h2>
+            <p>${t.theory}</p>
+          </div>
+
+          <div class="aula-section">
+            <h2 style="color:${t.color}">📌 Quando Usar ${t.name}?</h2>
+            <p>${t.when}</p>
+          </div>
+
+          <div class="aula-section">
+            <h2 style="color:${t.color}">🔢 Passo a Passo Detalhado</h2>
+            <div class="aula-step-grid">
+              ${t.steps.map((s,i)=>`
+                <div class="aula-step">
+                  <div class="aula-step-num" style="background:${t.color}">${i+1}</div>
+                  <div class="aula-step-body"><strong>${s.t}</strong><span>${s.d}</span></div>
+                </div>`).join('')}
+            </div>
+            <div class="aula-tip-box">
+              <p>💡 <strong>Dica de ouro:</strong> Muitas equipes pulam etapas por pressão de tempo. Resista à tentação — cada etapa do ${t.name} existe por um motivo. Pular uma etapa hoje gera retrabalho amanhã.</p>
+            </div>
+          </div>
+
+          <div class="aula-section">
+            <h2 style="color:${t.color}">✅ Benefícios Comprovados</h2>
+            <ul>${t.benefits.map(b=>`<li><strong>${b.split('–')[0]}</strong>${b.includes('–')?'–'+b.split('–')[1]:''}</li>`).join('')}</ul>
+          </div>
+
+          <div class="aula-section">
+            <h2 style="color:var(--5w2h)">📡 Caso Real — Setor Telecom</h2>
+            <div class="aula-telecom-box">
+              <h4>Situação & Resultado Comprovado</h4>
+              <p>${t.telecom}</p>
+            </div>
+          </div>
+
+          <div class="aula-section">
+            <h2 style="color:var(--pdca)">🤖 IA Especialista — Tire sua dúvida sobre ${t.name}</h2>
+            <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Descreva sua situação específica e a IA explica como aplicar ${t.name} no seu contexto real:</p>
+            <textarea class="ia-tool-input" id="aula-ia-input-${t.id}" placeholder="Ex: Quero aplicar ${t.name} na minha equipe de suporte Telecom. Como começar?"></textarea>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" id="aula-ia-btn-${t.id}" onclick="runAulaIA('${t.id}')">🤖 Consultar IA sobre ${t.name} →</button>
+            <div id="aula-ia-result-${t.id}" style="margin-top:1rem"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="aula-quiz-card">
+            <h3>🧠 Quiz de Fixação</h3>
+            <div class="quiz-q">${quiz.q}</div>
+            <div id="quiz-opts-${t.id}">
+              ${quiz.opts.map((o,i)=>`<div class="quiz-opt" id="qo-${t.id}-${i}" onclick="answerQuiz('${t.id}',${i})">${o}</div>`).join('')}
+            </div>
+            <div id="quiz-feedback-${t.id}"></div>
+          </div>
+          <div style="margin-top:1rem">
+            <button class="aula-export-btn" style="width:100%;justify-content:center" onclick="exportPDF('${t.id}')">📄 Baixar PDF desta aula</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function closeAula(){
+  document.getElementById('training-aula').style.display='none';
+  document.getElementById('training-list').style.display='block';
+}
+
+function answerQuiz(toolId,chosen){
+  const t=tools.find(x=>x.id===toolId);if(!t) return;
+  const quiz=t.quiz;
+  document.querySelectorAll(`[id^="qo-${toolId}"]`).forEach(el=>el.style.pointerEvents='none');
+  const chosenEl=document.getElementById(`qo-${toolId}-${chosen}`);
+  const correctEl=document.getElementById(`qo-${toolId}-${quiz.correct}`);
+  if(chosen===quiz.correct){
+    chosenEl.classList.add('correct');
+    document.getElementById(`quiz-feedback-${toolId}`).innerHTML=`<div class="quiz-feedback ok">✅ Correto! ${quiz.explanation}</div>`;
+  } else {
+    chosenEl.classList.add('wrong');
+    correctEl.classList.add('correct');
+    document.getElementById(`quiz-feedback-${toolId}`).innerHTML=`<div class="quiz-feedback err">❌ Incorreto. ${quiz.explanation}</div>`;
+  }
+}
+
+async function runAulaIA(toolId){
+  const t=tools.find(x=>x.id===toolId);
+  const inp=document.getElementById(`aula-ia-input-${toolId}`).value.trim();
+  if(!inp){alert('Descreva sua dúvida!');return;}
+  const btn=document.getElementById(`aula-ia-btn-${toolId}`);
+  btn.disabled=true;btn.textContent='⏳ Consultando IA...';
+  const re=document.getElementById(`aula-ia-result-${toolId}`);
+  re.innerHTML=`<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div><div class="ai-suggestion" id="aia-${toolId}"></div>`;
+  let full="";const se=document.getElementById(`aia-${toolId}`);const te=re.querySelector('.typing-dots');
+  await callClaude(`Você é professor especialista em ${t.name} aplicado ao setor Telecom. Responda de forma didática, prática e com exemplo Telecom. Use **negrito** para conceitos-chave. Máximo 400 palavras.`,
+    `Dúvida sobre ${t.name}: ${inp}`,
+    c=>{te&&(te.style.display='none');full+=c;se.innerHTML=fmt(full)+'<span class="cursor-blink"></span>';},
+    ()=>{se.innerHTML=fmt(full);btn.disabled=false;btn.textContent=`🤖 Consultar IA sobre ${t.name} →`;}
+  );
+}
+
+// ══════════════════════════════════════
+// EXPORTAR PDF
+// ══════════════════════════════════════
+function exportPDF(toolId){
+  const t=tools.find(x=>x.id===toolId);if(!t) return;
+  const stepsHTML=t.steps.map((s,i)=>`<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;padding:12px;background:#f4f4ff;border-radius:8px;border-left:4px solid #6C63FF"><div style="width:28px;height:28px;border-radius:50%;background:#6C63FF;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;line-height:1">${i+1}</div><div><strong style="display:block;font-size:13px;color:#1a1a2e;margin-bottom:4px">${s.t}</strong><span style="font-size:12px;color:#444;line-height:1.6">${s.d}</span></div></div>`).join('');
+  const benefitsHTML=t.benefits.map(b=>`<li style="font-size:12px;color:#444;line-height:1.8;margin-bottom:4px">${b}</li>`).join('');
+  // Build full HTML using only system fonts — no remote resources
+  const html=`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>QualyTools — ${t.name}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;background:#fff;padding:36px;font-size:13px}
+  h1{font-size:26px;font-weight:900;color:#1a1a2e;margin-bottom:8px}
+  h2{font-size:15px;font-weight:800;color:#1a1a2e;margin-bottom:10px}
+  p{font-size:12px;color:#444;line-height:1.7}
+  .sec{background:#f4f4ff;border-radius:10px;padding:18px;margin-bottom:18px}
+  .sec-orange{border-left:4px solid #FFA94D}
+  .sec-green{border-left:4px solid #20C997}
+  .sec-blue{border-left:4px solid #339AF0}
+  .sec-purple{border-left:4px solid #6C63FF}
+  .sec-lime{border-left:4px solid #69DB7C}
+  .hero{background:#f0efff;border:2px solid #c5c2ff;border-radius:14px;padding:28px;margin-bottom:22px}
+  .tag{display:inline-block;background:#e8e7ff;color:#6C63FF;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-right:6px}
+  .tip{background:#fffbe6;border:1px solid #ffe066;border-radius:8px;padding:12px;margin-top:12px;font-size:12px;color:#333;line-height:1.6}
+  .telecom-box{background:#e8f4ff;border-radius:8px;padding:14px;font-size:12px;color:#1a1a2e;line-height:1.7}
+  .footer{background:#6C63FF;border-radius:10px;padding:18px;text-align:center;margin-top:8px}
+  .footer p{color:#fff;font-size:12px;font-weight:700;margin-bottom:4px}
+  .footer span{color:rgba(255,255,255,.7);font-size:10px}
+  ul{padding-left:16px}
+  @media print{body{padding:20px}@page{margin:15mm}}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6C63FF;margin-bottom:8px">QualyTools — Material de Treinamento</div>
+    <h1>${t.icon} ${t.name}</h1>
+    <p style="font-size:13px;color:#555;margin-bottom:12px">${t.short}</p>
+    <div>${t.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+  </div>
+
+  <div class="sec sec-purple">
+    <h2>📖 Teoria e Fundamentos</h2>
+    <p>${t.theory}</p>
+  </div>
+
+  <div class="sec sec-orange">
+    <h2>📌 Quando Usar ${t.name}?</h2>
+    <p>${t.when}</p>
+  </div>
+
+  <div class="sec sec-green">
+    <h2>🔢 Passo a Passo Detalhado</h2>
+    ${stepsHTML}
+    <div class="tip">💡 <strong>Dica de ouro:</strong> Muitas equipes pulam etapas por pressão de tempo. Resista — cada etapa do ${t.name} existe por um motivo. Pular uma etapa hoje gera retrabalho amanhã.</div>
+  </div>
+
+  <div class="sec sec-blue">
+    <h2>📡 Caso Real — Setor Telecom</h2>
+    <div class="telecom-box">${t.telecom}</div>
+  </div>
+
+  <div class="sec sec-lime">
+    <h2>✅ Benefícios Comprovados</h2>
+    <ul>${benefitsHTML}</ul>
+  </div>
+
+  <div class="sec sec-purple" style="background:#f4f4ff">
+    <h2>🧠 Quiz de Fixação</h2>
+    <p style="margin-bottom:10px"><strong>${t.quiz.q}</strong></p>
+    ${t.quiz.opts.map((o,i)=>`<div style="padding:8px 12px;margin-bottom:6px;border-radius:6px;font-size:12px;${i===t.quiz.correct?'background:#d4f7ec;border:1.5px solid #20C997;color:#0a6640;font-weight:700':'background:#fff;border:1.5px solid #ddd;color:#444'}">${i===t.quiz.correct?'✓ ':''} ${o}</div>`).join('')}
+    <p style="margin-top:10px;font-size:11px;color:#666"><strong>Explicação:</strong> ${t.quiz.explanation}</p>
+  </div>
+
+  <div class="footer">
+    <p>QualyTools — Ferramentas da Qualidade com IA Real</p>
+    <span>Material gerado em ${new Date().toLocaleDateString('pt-BR')} · Powered by Claude Sonnet (Anthropic)</span>
+  </div>
+
+  <script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>
+</body>
+</html>`;
+
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(!win){alert('Permita pop-ups para este site e tente novamente.');URL.revokeObjectURL(url);}
+  else{setTimeout(()=>URL.revokeObjectURL(url),10000);}
+}
+
+// ══════════════════════════════════════
+// PDI
+// ══════════════════════════════════════
+function renderPDI(){
+  const isPro=S.plan==='pro';
+  document.getElementById('pdi-locked').classList.toggle('hidden',isPro);
+  const pc=document.getElementById('pdi-content');
+  if(!isPro){pc.innerHTML='';return;}
+  const actions=[
+    {t:'Concluir trilha de Liderança em Qualidade',d:'Treinamento interno — até 31/03'},
+    {t:'Aplicar FMEA em 1 processo crítico',d:'Processo de ativação — até 15/04'},
+    {t:'Atingir NPS da equipe ≥ 70',d:'Meta trimestral — até 30/06'},
+    {t:'Mentorear 2 colaboradores no PDCA',d:'Desenvolvimento de equipe — contínuo'},
+    {t:'Obter certificação Six Sigma Green Belt',d:'Certificação externa — até 31/12'}
+  ];
+  pc.innerHTML=`
+    <div class="pdi-hero">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.5rem">📈 Meu PDI — Plano de Desenvolvimento Individual</h2>
+      <p style="color:var(--muted);font-size:.9rem">Plano de crescimento estruturado com competências, metas e ações. A IA personaliza para o seu perfil.</p>
+    </div>
+    <div class="pdi-grid">
+      <div class="pdi-card">
+        <h3>🎯 Minhas Competências</h3>
+        ${[{l:'Ferramentas da Qualidade',v:65,c:'var(--pdca)'},{l:'Liderança de Times',v:78,c:'var(--fca)'},{l:'Gestão de Dados / KPIs',v:45,c:'var(--pareto)'},{l:'Comunicação Executiva',v:82,c:'var(--ishikawa)'},{l:'Gestão de Projetos',v:55,c:'var(--5w2h)'}].map(c=>`<div class="competency-bar"><label>${c.l}<span>${c.v}%</span></label><div class="bar-track"><div class="bar-fill" style="width:${c.v}%;background:${c.c}"></div></div></div>`).join('')}
+      </div>
+      <div class="pdi-card">
+        <h3>✅ Ações de Desenvolvimento</h3>
+        ${actions.map((a,i)=>`<div class="pdi-action-item"><div class="pdi-action-check ${S.pdiActions[i]?'done':''}" onclick="togglePDI(${i})">${S.pdiActions[i]?'✓':''}</div><div style="flex:1"><div style="font-weight:600;font-size:.85rem;${S.pdiActions[i]?'text-decoration:line-through;opacity:.5':''}">${a.t}</div><div style="font-size:.75rem;color:var(--muted)">${a.d}</div></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="pdi-card" style="margin-bottom:1.5rem">
+      <h3 style="margin-bottom:1rem">🗓️ Plano Trimestral</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        ${[{q:'Q1',f:'Domínio Técnico',d:'Concluir trilhas e aplicar PDCA em 1 processo real com resultado mensurável.',c:'var(--pdca)'},{q:'Q2',f:'Aplicação Prática',d:'Liderar 1 projeto de melhoria completo com KPIs e apresentação para diretoria.',c:'var(--pareto)'},{q:'Q3/Q4',f:'Cultura & Certificação',d:'Mentorear a equipe, criar rotina de qualidade e buscar Green Belt Six Sigma.',c:'var(--ishikawa)'}].map(q=>`<div style="background:${q.c}12;border:1px solid ${q.c}30;border-radius:12px;padding:1.2rem"><div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${q.c};margin-bottom:.4rem">${q.q}</div><div style="font-weight:700;font-size:.9rem;margin-bottom:.4rem">${q.f}</div><div style="font-size:.8rem;color:var(--muted);line-height:1.5">${q.d}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="pdi-card">
+      <h3 style="margin-bottom:.5rem">🤖 IA — Personalize seu PDI</h3>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:1rem">Descreva seu perfil atual e onde quer chegar. A IA gera recomendações personalizadas.</p>
+      <textarea class="ia-tool-input" id="pdi-ia-input" placeholder="Ex: Sou coordenador de qualidade em telecom com 5 anos de experiência. Quero me tornar gerente em 2 anos..."></textarea>
+      <button class="btn btn-primary" id="pdi-ia-btn" style="width:100%;justify-content:center" onclick="runPDIIA()">🤖 Gerar recomendações de PDI →</button>
+      <div id="pdi-ia-result" style="margin-top:1rem"></div>
+    </div>`;
+}
+
+async function runPDIIA(){
+  const inp=document.getElementById('pdi-ia-input').value.trim();
+  if(!inp){alert('Descreva seu perfil e objetivo!');return;}
+  const btn=document.getElementById('pdi-ia-btn');
+  btn.disabled=true;btn.textContent='⏳ Gerando PDI...';
+  const re=document.getElementById('pdi-ia-result');
+  re.innerHTML=`<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div><div class="ai-suggestion" id="pdi-stream"></div>`;
+  let full="";const se=document.getElementById('pdi-stream');const te=re.querySelector('.typing-dots');
+  await callClaude(`Especialista em desenvolvimento de carreira em Qualidade e Telecom. Crie recomendações concretas de PDI: top 3 competências, 5 ações com prazo, recursos recomendados e meta de 12 meses. Use **negrito**. Máximo 500 palavras.`,
+    `Perfil: ${inp}`,
+    c=>{te&&(te.style.display='none');full+=c;se.innerHTML=fmt(full)+'<span class="cursor-blink"></span>';},
+    ()=>{se.innerHTML=fmt(full);btn.disabled=false;btn.textContent='🤖 Gerar recomendações de PDI →';}
+  );
+}
+function togglePDI(i){S.pdiActions[i]=!S.pdiActions[i];renderPDI();}
+
+// ══════════════════════════════════════
+// NAVEGAÇÃO & AUTH
+// ══════════════════════════════════════
+function showPage(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(pg).classList.add('active');window.scrollTo(0,0);}
+
+function goSection(sec){
+  if(!S.loggedIn){openModal('login');return;}
+  showPage('dashboard');
+  document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  const sb=document.getElementById('sb-'+sec);if(sb) sb.classList.add('active');
+  document.querySelectorAll('.nav-bar a').forEach(a=>a.classList.remove('active'));
+  const na=document.getElementById('nav-'+sec);if(na) na.classList.add('active');
+  if(sec==='ferramentas') renderTools();
+  if(sec==='treinamento'){renderTrainingList('colaborador');}
+  if(sec==='pdi') renderPDI();
+}
+
+// ══════════════════════════════════════
+// CONFIG — aponte para seu backend real
+// ══════════════════════════════════════
+const API_URL = "https://SEU-BACKEND.com"; // troque pela URL do seu servidor Node.js
+
+// ══════════════════════════════════════
+// PAYMENT FLOW
+// ══════════════════════════════════════
+async function startCheckout(email, name) {
+  const btn = document.getElementById('checkout-btn');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Criando pagamento...'; }
+  try {
+    const res = await fetch(`${API_URL}/create-subscription`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, name })
+    });
+    const data = await res.json();
+    if(data.initPoint){
+      // Abre o checkout do Mercado Pago numa nova aba
+      window.open(data.initPoint, '_blank');
+      // Enquanto isso, mostra tela de espera com polling
+      showPaymentWaiting(email, name, data.subscriptionId);
+    } else {
+      throw new Error(data.error || 'Erro ao criar assinatura');
+    }
+  } catch(err) {
+    showPaymentError(err.message);
+    if(btn){ btn.disabled=false; btn.textContent='💳 Pagar com Mercado Pago'; }
+  }
+}
+
+function showPaymentWaiting(email, name, subId) {
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div style="text-align:center;padding:1rem 0">
+      <div style="font-size:3rem;margin-bottom:1rem;animation:spin 2s linear infinite;display:inline-block">⏳</div>
+      <div class="modal-title" style="font-size:1.3rem">Aguardando confirmação</div>
+      <div class="modal-sub">Finalize o pagamento na aba do Mercado Pago.<br>Esta tela atualiza automaticamente.</div>
+      <div style="background:var(--dark2);border-radius:12px;padding:1rem;margin:1rem 0;font-size:.82rem;color:var(--muted)">
+        <div style="margin-bottom:.4rem">📧 <strong style="color:var(--text)">${email}</strong></div>
+        <div>💳 Plano Pro — R$47/mês</div>
+      </div>
+      <div style="display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem" id="polling-dots">
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+      </div>
+      <button onclick="checkPaymentStatus('${email}','${name}')" style="width:100%;padding:.8rem;border-radius:10px;border:1.5px solid var(--pdca);background:transparent;color:var(--pdca);font-weight:700;font-size:.88rem;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:.6rem">🔄 Já paguei — verificar agora</button>
+      <button onclick="closeModal()" style="width:100%;padding:.7rem;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-weight:600;font-size:.82rem;cursor:pointer;font-family:Inter,sans-serif">Fechar e verificar depois</button>
+    </div>`;
+  // Polling automático a cada 5s por 3 minutos
+  let tries = 0;
+  const maxTries = 36;
+  const interval = setInterval(async () => {
+    tries++;
+    const activated = await checkPaymentStatus(email, name, true);
+    if(activated || tries >= maxTries) clearInterval(interval);
+  }, 5000);
+}
+
+async function checkPaymentStatus(email, name, silent=false) {
+  try {
+    const res = await fetch(`${API_URL}/user-status?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if(data.plan === 'pro' && data.status === 'active') {
+      // Pagamento confirmado!
+      loginUser(name, 'pro', email);
+      closeModal();
+      showPaymentSuccess(data.nextBillingDate);
+      return true;
+    }
+    if(!silent) {
+      const content = document.getElementById('modal-content');
+      if(content) {
+        const info = content.querySelector('#pay-status-info');
+        if(info) info.textContent = `Status: ${data.status === 'pending' ? 'aguardando pagamento...' : data.status}`;
+      }
+    }
+  } catch(err) {
+    if(!silent) console.error('Erro ao verificar status:', err);
+  }
+  return false;
+}
+
+function showPaymentSuccess(nextDate) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#20C997;color:#fff;padding:1rem 2rem;border-radius:12px;font-weight:700;font-size:.95rem;z-index:999999;box-shadow:0 8px 32px rgba(32,201,151,.4);text-align:center`;
+  toast.innerHTML = `🎉 Plano Pro ativado!${nextDate ? `<br><span style="font-size:.78rem;opacity:.85">Próxima cobrança: ${new Date(nextDate).toLocaleDateString('pt-BR')}</span>` : ''}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 6000);
+}
+
+function showPaymentError(msg) {
+  const content = document.getElementById('modal-content');
+  if(!content) return;
+  const errDiv = document.createElement('div');
+  errDiv.style.cssText = 'background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);border-radius:10px;padding:.8rem 1rem;font-size:.83rem;color:var(--fca);margin-top:.8rem;';
+  errDiv.textContent = `⚠️ ${msg}`;
+  content.appendChild(errDiv);
+}
+
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
+let selPlan='free';
+function openModal(type,planHint){
+  const modal=document.getElementById('modal'),content=document.getElementById('modal-content');
+  modal.classList.remove('hidden');
+
+  if(type==='login'){
+    content.innerHTML=`
+      <div class="modal-title">Bem-vindo de volta 👋</div>
+      <div class="modal-sub">Acesse sua conta QualyTools</div>
+      <div class="modal-tabs">
+        <button class="modal-tab active">Entrar</button>
+        <button class="modal-tab" onclick="openModal('register')">Criar conta</button>
+      </div>
+      <div class="form-g"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
+      <div class="form-g"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="modal-btn" onclick="doLogin()">Entrar na minha conta</button>
+      <div style="text-align:center;margin-top:.8rem;font-size:.8rem;color:var(--muted)">Não tem conta? <a onclick="openModal('register')" style="color:var(--pdca);cursor:pointer">Crie grátis →</a></div>`;
+
+  } else if(type==='register'){
+    selPlan=planHint||'free';
+    content.innerHTML=`
+      <div class="modal-title">Crie sua conta</div>
+      <div class="modal-sub">Aulas completas grátis para todos os planos</div>
+      <div class="modal-tabs">
+        <button class="modal-tab" onclick="openModal('login')">Entrar</button>
+        <button class="modal-tab active">Criar conta</button>
+      </div>
+      <div class="plan-select">
+        <div class="plan-opt ${selPlan==='free'?'selected':''}" id="opt-free" onclick="selPlan='free';document.getElementById('opt-free').classList.add('selected');document.getElementById('opt-pro').classList.remove('selected')">
+          <h4>Free</h4><p>R$0 — Aulas + 3 IA/dia</p>
+        </div>
+        <div class="plan-opt ${selPlan==='pro'?'selected':''}" id="opt-pro" onclick="selPlan='pro';document.getElementById('opt-pro').classList.add('selected');document.getElementById('opt-free').classList.remove('selected')">
+          <h4>⭐ Pro</h4><p>R$47/mês — IA ilimitada + PDI</p>
+        </div>
+      </div>
+      <div class="form-g"><label>Nome completo</label><input id="reg-name" type="text" placeholder="Seu nome"></div>
+      <div class="form-g"><label>E-mail</label><input id="reg-email" type="email" placeholder="seu@email.com"></div>
+      <div class="form-g"><label>Senha</label><input type="password" placeholder="Mínimo 8 caracteres"></div>
+      <div class="form-g"><label>Perfil</label>
+        <select><option>Colaborador Operacional</option><option>Analista de Qualidade</option><option>Gestor / Supervisor</option><option>Coordenador / Gerente</option><option>Diretor / C-Level</option></select>
+      </div>
+      <button class="modal-btn" onclick="doRegister()">Continuar →</button>`;
+
+  } else if(type==='upgrade'){
+    content.innerHTML=`
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:2.5rem;margin-bottom:.8rem">⭐</div>
+        <div class="modal-title">Assinar QualyTools Pro</div>
+        <div class="modal-sub">R$47/mês · cancele quando quiser</div>
+      </div>
+      <div style="background:var(--dark2);border-radius:12px;padding:1.2rem;margin-bottom:1.2rem">
+        ${['IA Claude Sonnet ilimitado (∞/dia)','IA especialista dentro de cada aula','PDI Gestor com IA personalizada','Trilha avançada para gestores','Certificado de conclusão'].map(f=>`<div style="display:flex;align-items:center;gap:.7rem;padding:.5rem 0;font-size:.87rem;border-bottom:1px solid var(--border)"><span style="color:var(--pdca);font-weight:800">✓</span>${f}</div>`).join('')}
+      </div>
+      <div class="form-g"><label>Seu nome</label><input id="upgrade-name" type="text" placeholder="Nome completo" value="${S.user||''}"></div>
+      <div class="form-g"><label>E-mail</label><input id="upgrade-email" type="email" placeholder="seu@email.com" value="${S.userEmail||''}"></div>
+      <button class="modal-btn" id="checkout-btn" style="background:#009ee3;display:flex;align-items:center;justify-content:center;gap:.6rem" onclick="doCheckout()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        💳 Pagar com Mercado Pago
+      </button>
+      <div id="pay-status-info" style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:.8rem"></div>
+      <div style="text-align:center;margin-top:.5rem">
+        <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.22/mercadopago/logo__large@2x.png" style="height:24px;opacity:.6" onerror="this.style.display='none'">
+      </div>`;
+
+  } else if(type==='cancel'){
+    content.innerHTML=`
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:2.5rem;margin-bottom:.8rem">😢</div>
+        <div class="modal-title">Cancelar assinatura?</div>
+        <div class="modal-sub">Você perderá acesso ao Pro ao final do período pago.</div>
+      </div>
+      <button class="modal-btn" style="background:var(--fca)" onclick="doCancelSub()">Sim, cancelar assinatura</button>
+      <button onclick="closeModal()" style="width:100%;padding:.8rem;border-radius:10px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:.88rem;cursor:pointer;font-family:Inter,sans-serif;margin-top:.5rem">Manter Pro</button>`;
+  }
+}
+
+async function doCheckout(){
+  const name = document.getElementById('upgrade-name')?.value.trim();
+  const email = document.getElementById('upgrade-email')?.value.trim();
+  if(!name||!email){ showPaymentError('Preencha nome e e-mail.'); return; }
+  if(!/\S+@\S+\.\S+/.test(email)){ showPaymentError('E-mail inválido.'); return; }
+  S.userEmail = email;
+  if(!S.loggedIn){ loginUser(name,'free',email); }
+  await startCheckout(email, name);
+}
+
+async function doCancelSub(){
+  closeModal();
+  try {
+    const res = await fetch(`${API_URL}/cancel-subscription`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:S.userEmail})
+    });
+    const d = await res.json();
+    alert(d.message || 'Assinatura cancelada.');
+    S.plan='free';
+    document.getElementById('plan-badge').textContent='Free';
+    document.getElementById('plan-badge').className='tag badge-free';
+  } catch(e){ alert('Erro ao cancelar. Tente novamente.'); }
+}
+
+function doLogin(){
+  const email=document.getElementById('login-email')?.value||'demo@qualytools.com';
+  const name=email.split('@')[0];
+  // Em produção: chame seu backend para autenticar
+  // Aqui simulamos e verificamos o status real
+  loginUser(name,'free',email);
+  closeModal();
+  // Verifica se tem plano ativo no backend
+  fetch(`${API_URL}/user-status?email=${encodeURIComponent(email)}`)
+    .then(r=>r.json())
+    .then(d=>{ if(d.plan==='pro'&&d.status==='active'){ S.plan='pro'; updatePlanUI(); }})
+    .catch(()=>{});
+}
+
+function doRegister(){
+  const name=document.getElementById('reg-name')?.value||'Usuário';
+  const email=document.getElementById('reg-email')?.value||`${Date.now()}@demo.com`;
+  if(selPlan==='pro'){
+    loginUser(name,'free',email);
+    closeModal();
+    openModal('upgrade');
+  } else {
+    loginUser(name,'free',email);
+    closeModal();
+  }
+}
+
+function loginUser(name,plan,email=''){
+  S.loggedIn=true; S.user=name; S.plan=plan; S.userEmail=email;
+  document.getElementById('topbar-auth').classList.add('hidden');
+  document.getElementById('topbar-user').classList.remove('hidden');
+  document.getElementById('user-initials').textContent=name.substring(0,2).toUpperCase();
+  document.getElementById('user-name-bar').textContent=name.split(' ')[0];
+  document.getElementById('greeting-name').textContent=name.split(' ')[0];
+  if(plan==='pro') updatePlanUI();
+  showPage('dashboard'); goSection('solver');
+}
+
+function updatePlanUI(){
+  S.plan='pro';
+  document.getElementById('plan-badge').textContent='Pro';
+  document.getElementById('plan-badge').className='tag badge-pro';
+  document.getElementById('queries-used').textContent='∞';
+  document.getElementById('lock-pdi').classList.add('hidden');
+  const upSec=document.getElementById('sb-upgrade-section');
+  if(upSec) upSec.innerHTML=`<div style="background:rgba(32,201,151,.08);border:1px solid rgba(32,201,151,.2);border-radius:14px;padding:1rem;text-align:center;font-size:.82rem"><div style="color:var(--pareto);font-weight:700;margin-bottom:.3rem">✅ Plano Pro Ativo</div><div style="color:var(--muted);font-size:.75rem;margin-bottom:.8rem">Próxima cobrança via Mercado Pago</div><button onclick="openModal('cancel')" style="width:100%;padding:.5rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:.75rem;cursor:pointer;font-family:Inter,sans-serif">Cancelar assinatura</button></div>`;
+}
+
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this) closeModal();});
+
+renderTools();
+</script>
+</body>
+</html>
